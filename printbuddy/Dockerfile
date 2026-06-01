@@ -11,6 +11,24 @@ RUN apt-get update \
 RUN curl -fsSL "https://github.com/vmhomelab/Printbuddy/archive/${PRINTBUDDY_REF}.tar.gz" \
     | tar -xz --strip-components=1
 
+# Fail the image build if Home Assistant/Docker ever builds against a stale
+# Printbuddy revision again. These fields are required by the Moonraker status
+# serializer and websocket path; older commits missed them and produced
+# AttributeError: hms_errors/raw_data at runtime.
+RUN node - <<'JS'
+const fs = require('fs');
+const source = fs.readFileSync('backend/app/services/printer_providers/moonraker.py', 'utf8');
+const required = [
+  'raw_data: dict[str, Any] = field(default_factory=dict)',
+  'hms_errors: list[Any] = field(default_factory=list)',
+  'return self.state.connected',
+];
+const missing = required.filter((needle) => !source.includes(needle));
+if (missing.length) {
+  throw new Error(`Downloaded Printbuddy source is missing Moonraker fixes: ${missing.join(', ')}`);
+}
+JS
+
 # Home Assistant Ingress serves the add-on below /api/hassio_ingress/<token>/.
 # Patch the frontend at build time so Vite emits relative assets and runtime
 # calls to /api, /img, /icons, /fonts, /manifest.json, and /sw*.js stay under
@@ -130,7 +148,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.12" \
+    io.hass.version="0.1.13" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
@@ -211,6 +229,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh /run.sh \
     && printf 'ref: refs/heads/%s\n' "$PRINTBUDDY_REF" > /app/.git/HEAD
 
 ENV PYTHONUNBUFFERED=1 \
+    PRINTBUDDY_REF=${PRINTBUDDY_REF} \
     DATA_DIR=/data/printbuddy \
     LOG_DIR=/data/logs \
     PORT=8000 \
