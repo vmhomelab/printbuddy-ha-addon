@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Pinned the add-on runtime stage to a Debian Python base instead of Home Assistant's injected Alpine base image.
+- Switched the runtime to Python 3.12 and constrained `numpy<2` so older x86_64 CPUs without x86-64-v2 support can install/import NumPy successfully.
+- Forced binary wheels for NumPy, fast-simplification, and OpenCV during dependency installation to avoid local source builds inside the Supervisor builder.
+
 ## 0.1.1
 
 - Fixed Home Assistant add-on builds that use an Alpine-based `BUILD_FROM` image by supporting `apk` package installation.

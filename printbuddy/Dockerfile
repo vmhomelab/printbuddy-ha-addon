@@ -1,4 +1,4 @@
-ARG BUILD_FROM=python:3.13-slim-trixie
+ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
 ARG PRINTBUDDY_REF=dev
@@ -15,14 +15,14 @@ WORKDIR /src/frontend
 RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
-FROM ${BUILD_FROM}
+FROM ${RUNTIME_FROM}
 ARG PRINTBUDDY_REF=dev
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.1" \
+    io.hass.version="0.1.2" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
@@ -66,9 +66,9 @@ RUN if command -v apt-get >/dev/null 2>&1; then \
 # Install the Tailscale CLI only. If the host socket is unavailable, Printbuddy
 # logs a hint and falls back to its normal non-Tailscale behavior.
 RUN if command -v apt-get >/dev/null 2>&1; then \
-        curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg \
+        curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg \
             -o /usr/share/keyrings/tailscale-archive-keyring.gpg \
-        && curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list \
+        && curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.tailscale-keyring.list \
             -o /etc/apt/sources.list.d/tailscale.list \
         && apt-get update \
         && apt-get install -y --no-install-recommends tailscale \
@@ -83,8 +83,12 @@ RUN if command -v apt-get >/dev/null 2>&1; then \
 RUN setcap cap_net_bind_service=+ep "$(readlink -f "$(command -v python3)")"
 
 COPY --from=printbuddy-src /src/requirements.txt ./requirements.txt
-RUN python3 -m pip install --root-user-action=ignore --break-system-packages --upgrade 'pip>=26.1' \
-    && python3 -m pip install --root-user-action=ignore --break-system-packages -r requirements.txt
+RUN printf 'numpy<2\n' > /tmp/old-cpu-constraints.txt \
+    && python3 -m pip install --root-user-action=ignore --break-system-packages --upgrade 'pip>=26.1' \
+    && python3 -m pip install --root-user-action=ignore --break-system-packages \
+        --only-binary=numpy,fast-simplification,opencv-python-headless \
+        -c /tmp/old-cpu-constraints.txt \
+        -r requirements.txt
 
 COPY --from=printbuddy-src /src/backend ./backend
 COPY --from=printbuddy-src /src/static ./static
