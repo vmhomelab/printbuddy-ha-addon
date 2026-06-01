@@ -15,9 +15,8 @@ ingress_stream: true
 panel_icon: mdi:printer-3d
 panel_title: Printbuddy
 host_network: true
-watchdog: http://[HOST]:[PORT:8000]/health
+watchdog: http://[HOST]:8000/health
 map:
-  - addon_config:rw
   - share:rw
   - media:rw
   - ssl:ro
