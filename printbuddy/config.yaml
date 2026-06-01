@@ -1,0 +1,47 @@
+name: Printbuddy
+version: "0.1.0"
+slug: printbuddy
+description: Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers.
+url: https://github.com/vmhomelab/printbuddy-ha-addon
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+init: false
+ingress: true
+ingress_port: 8000
+ingress_stream: true
+panel_icon: mdi:printer-3d
+panel_title: Printbuddy
+host_network: true
+watchdog: http://[HOST]:[PORT:8000]/health
+map:
+  - addon_config:rw
+  - share:rw
+  - media:rw
+  - ssl:ro
+options:
+  log_level: info
+  puid: 1000
+  pgid: 1000
+  use_system_trust_store: false
+schema:
+  log_level: list(trace|debug|info|warning|error|critical)
+  puid: int(0,65535)
+  pgid: int(0,65535)
+  use_system_trust_store: bool
+ports:
+  8000/tcp: null
+  322/tcp: 322
+  990/tcp: 990
+  8883/tcp: 8883
+  3000/tcp: null
+  3002/tcp: null
+ports_description:
+  8000/tcp: Printbuddy web UI/API. Usually accessed through Home Assistant Ingress.
+  322/tcp: Virtual printer FTP/control compatibility port.
+  990/tcp: FTPS printer compatibility port.
+  8883/tcp: MQTT over TLS printer compatibility port.
+  3000/tcp: Optional auxiliary service port used by Printbuddy features.
+  3002/tcp: Optional auxiliary service port used by Printbuddy features.

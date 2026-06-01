@@ -1,0 +1,59 @@
+name: Validate add-on repository
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate YAML and required files
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          required = [
+              Path('repository.yaml'),
+              Path('printbuddy/config.yaml'),
+              Path('printbuddy/build.yaml'),
+              Path('printbuddy/Dockerfile'),
+              Path('printbuddy/rootfs/run.sh'),
+              Path('printbuddy/README.md'),
+              Path('printbuddy/DOCS.md'),
+              Path('printbuddy/CHANGELOG.md'),
+          ]
+          missing = [str(path) for path in required if not path.exists()]
+          if missing:
+              raise SystemExit(f'Missing required files: {missing}')
+
+          repo = yaml.safe_load(Path('repository.yaml').read_text())
+          config = yaml.safe_load(Path('printbuddy/config.yaml').read_text())
+          build = yaml.safe_load(Path('printbuddy/build.yaml').read_text())
+
+          assert repo['name']
+          assert repo['url'].startswith('https://github.com/')
+          assert config['slug'] == 'printbuddy'
+          assert config['ingress'] is True
+          assert config['ingress_port'] == 8000
+          assert config['host_network'] is True
+          assert 'amd64' in config['arch']
+          assert build['args']['PRINTBUDDY_REF']
+          PY
+
+      - name: Shell syntax check
+        run: sh -n printbuddy/rootfs/run.sh
+
+      - name: Dockerfile syntax smoke test
+        run: docker buildx build --check printbuddy
