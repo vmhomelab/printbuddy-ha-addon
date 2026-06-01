@@ -1,5 +1,5 @@
 name: Printbuddy
-version: "0.1.5"
+version: "0.1.6"
 slug: printbuddy
 description: Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers.
 url: https://github.com/vmhomelab/printbuddy-ha-addon
@@ -11,6 +11,7 @@ boot: auto
 init: false
 ingress: true
 ingress_port: 8000
+ingress_entry: /
 ingress_stream: true
 panel_icon: mdi:printer-3d
 panel_title: Printbuddy

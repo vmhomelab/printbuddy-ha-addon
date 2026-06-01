@@ -27,7 +27,7 @@ function edit(path, transform) {
 }
 
 fs.writeFileSync('frontend/src/ha-ingress.ts', `
-function printbuddyIngressBase(): string {
+export function printbuddyIngressBase(): string {
   if (typeof window === 'undefined') return '';
   const match = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/);
   return match?.[1] ?? '';
@@ -72,6 +72,10 @@ for (const attr of ['src', 'href'] as const) {
 
 edit('frontend/vite.config.ts', (s) => s.replace('export default defineConfig({\n', "export default defineConfig({\n  base: './',\n"));
 edit('frontend/src/main.tsx', (s) => s.replace("import './i18n' // Initialize i18n\n", "import './i18n' // Initialize i18n\nimport './ha-ingress'\n"));
+edit('frontend/src/App.tsx', (s) => s
+  .replace("import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';", "import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';\nimport { printbuddyIngressBase } from './ha-ingress';")
+  .replace('<BrowserRouter>', '<BrowserRouter basename={printbuddyIngressBase() || undefined}>')
+);
 edit('frontend/src/api/client.ts', (s) => s.replace("const API_BASE = '/api/v1';", "const INGRESS_BASE = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\nconst API_BASE = `${INGRESS_BASE}/api/v1`;"));
 edit('frontend/src/hooks/useWebSocket.ts', (s) => s.replace(
   "    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;",
@@ -90,7 +94,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.5" \
+    io.hass.version="0.1.6" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

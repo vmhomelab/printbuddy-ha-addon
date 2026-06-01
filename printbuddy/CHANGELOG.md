@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Fixed React Router matching under Home Assistant Ingress by setting the router basename to the active `/api/hassio_ingress/<token>` prefix.
+- Sets the add-on Ingress entry point explicitly to `/` so Home Assistant opens the SPA root instead of a stale internal route.
+
 ## 0.1.5
 
 - Fixed blank Home Assistant Ingress screens by building the SPA with relative asset URLs.
