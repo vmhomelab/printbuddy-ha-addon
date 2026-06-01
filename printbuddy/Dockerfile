@@ -22,7 +22,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.0" \
+    io.hass.version="0.1.1" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
@@ -32,35 +32,59 @@ LABEL \
 WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-        ffmpeg \
-        gnupg \
-        gosu \
-        iproute2 \
-        jq \
-        libcap2-bin \
-        openssh-client \
-    && rm -rf /var/lib/apt/lists/*
+RUN if command -v apt-get >/dev/null 2>&1; then \
+        apt-get update \
+        && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            ffmpeg \
+            gnupg \
+            gosu \
+            iproute2 \
+            jq \
+            libcap2-bin \
+            openssh-client \
+        && rm -rf /var/lib/apt/lists/*; \
+    elif command -v apk >/dev/null 2>&1; then \
+        apk add --no-cache \
+            ca-certificates \
+            curl \
+            ffmpeg \
+            gnupg \
+            gosu \
+            iproute2 \
+            jq \
+            libcap \
+            openssh-client \
+            python3 \
+            py3-pip; \
+    else \
+        echo "Unsupported base image: no apt-get or apk found" >&2; \
+        exit 1; \
+    fi
 
 # Install the Tailscale CLI only. If the host socket is unavailable, Printbuddy
 # logs a hint and falls back to its normal non-Tailscale behavior.
-RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg \
-        -o /usr/share/keyrings/tailscale-archive-keyring.gpg \
-    && curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list \
-        -o /etc/apt/sources.list.d/tailscale.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends tailscale \
-    && rm -rf /var/lib/apt/lists/*
+RUN if command -v apt-get >/dev/null 2>&1; then \
+        curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg \
+            -o /usr/share/keyrings/tailscale-archive-keyring.gpg \
+        && curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list \
+            -o /etc/apt/sources.list.d/tailscale.list \
+        && apt-get update \
+        && apt-get install -y --no-install-recommends tailscale \
+        && rm -rf /var/lib/apt/lists/*; \
+    elif command -v apk >/dev/null 2>&1; then \
+        apk add --no-cache tailscale; \
+    else \
+        echo "Unsupported base image: no apt-get or apk found" >&2; \
+        exit 1; \
+    fi
 
-RUN setcap cap_net_bind_service=+ep "$(readlink -f /usr/local/bin/python3)"
+RUN setcap cap_net_bind_service=+ep "$(readlink -f "$(command -v python3)")"
 
 COPY --from=printbuddy-src /src/requirements.txt ./requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --root-user-action=ignore --upgrade 'pip>=26.1' \
-    && pip install --root-user-action=ignore -r requirements.txt
+RUN python3 -m pip install --root-user-action=ignore --break-system-packages --upgrade 'pip>=26.1' \
+    && python3 -m pip install --root-user-action=ignore --break-system-packages -r requirements.txt
 
 COPY --from=printbuddy-src /src/backend ./backend
 COPY --from=printbuddy-src /src/static ./static
