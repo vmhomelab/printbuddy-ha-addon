@@ -2,7 +2,7 @@
 
 This repository packages [Printbuddy](https://github.com/vmhomelab/Printbuddy) as a Home Assistant add-on.
 
-Printbuddy is a self-hosted 3D printer management app for Bambu Lab, Klipper, and Mainsail/Moonraker printers. The add-on keeps the current Printbuddy feature set available inside Home Assistant, including the web UI, printer monitoring, archive/queue features, virtual-printer compatibility ports, and Moonraker support.
+Printbuddy is a self-hosted 3D printer management app for Bambu Lab, Klipper and prusa printers. The add-on keeps the current Printbuddy feature set available inside Home Assistant, including the web UI, printer monitoring, archive/queue features, virtual-printer compatibility ports, and Moonraker support.
 
 > [!WARNING]
 > **This repository is still under active development**
