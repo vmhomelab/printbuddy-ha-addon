@@ -54,6 +54,8 @@ if [ "$(id -u)" -eq 0 ]; then
     chown -R "${PUID}:${PGID}" "$DATA_DIR" "$LOG_DIR" || true
 fi
 
+echo "[printbuddy-addon] starting Printbuddy ref ${PRINTBUDDY_REF:-unknown}"
+
 if [ "$USE_SYSTEM_TRUST_STORE_VALUE" = "true" ]; then
     if find /ssl -maxdepth 1 -type f -name '*.crt' 2>/dev/null | grep -q .; then
         mkdir -p /usr/local/share/ca-certificates/homeassistant
