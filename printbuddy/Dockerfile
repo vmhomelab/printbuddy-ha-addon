@@ -11,6 +11,74 @@ RUN apt-get update \
 RUN curl -fsSL "https://github.com/vmhomelab/Printbuddy/archive/${PRINTBUDDY_REF}.tar.gz" \
     | tar -xz --strip-components=1
 
+# Home Assistant Ingress serves the add-on below /api/hassio_ingress/<token>/.
+# Patch the frontend at build time so Vite emits relative assets and runtime
+# calls to /api, /img, /icons, /fonts, /manifest.json, and /sw*.js stay under
+# the ingress prefix instead of escaping to Home Assistant's own root origin.
+RUN cat > /tmp/patch-ha-ingress.cjs <<'JS' \
+    && node /tmp/patch-ha-ingress.cjs
+const fs = require('fs');
+
+function edit(path, transform) {
+  const before = fs.readFileSync(path, 'utf8');
+  const after = transform(before);
+  if (after === before) throw new Error(`No change made to ${path}`);
+  fs.writeFileSync(path, after);
+}
+
+fs.writeFileSync('frontend/src/ha-ingress.ts', `
+function printbuddyIngressBase(): string {
+  if (typeof window === 'undefined') return '';
+  const match = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/);
+  return match?.[1] ?? '';
+}
+
+function printbuddyWithIngressBase(url: string): string {
+  const base = printbuddyIngressBase();
+  if (!base || !url.startsWith('/') || url.startsWith('//') || url.startsWith(base + '/')) {
+    return url;
+  }
+  return base + url;
+}
+
+const originalFetch = window.fetch.bind(window);
+window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+  if (typeof input === 'string') {
+    return originalFetch(printbuddyWithIngressBase(input), init);
+  }
+  if (input instanceof URL && input.origin === window.location.origin) {
+    return originalFetch(new URL(printbuddyWithIngressBase(input.pathname + input.search + input.hash), window.location.origin), init);
+  }
+  if (input instanceof Request) {
+    const url = new URL(input.url);
+    const path = url.pathname + url.search + url.hash;
+    const rewritten = url.origin === window.location.origin ? printbuddyWithIngressBase(path) : path;
+    if (rewritten !== path) {
+      return originalFetch(new Request(rewritten, input), init);
+    }
+  }
+  return originalFetch(input, init);
+}) as typeof window.fetch;
+
+for (const attr of ['src', 'href'] as const) {
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, attr);
+  if (!descriptor?.set || !descriptor?.get) continue;
+  Object.defineProperty(Element.prototype, attr, {
+    get: descriptor.get,
+    set(value: string) { descriptor.set!.call(this, printbuddyWithIngressBase(value)); },
+  });
+}
+`);
+
+edit('frontend/vite.config.ts', (s) => s.replace('export default defineConfig({\n', "export default defineConfig({\n  base: './',\n"));
+edit('frontend/src/main.tsx', (s) => s.replace("import './i18n' // Initialize i18n\n", "import './i18n' // Initialize i18n\nimport './ha-ingress'\n"));
+edit('frontend/src/api/client.ts', (s) => s.replace("const API_BASE = '/api/v1';", "const INGRESS_BASE = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\nconst API_BASE = `${INGRESS_BASE}/api/v1`;"));
+edit('frontend/src/hooks/useWebSocket.ts', (s) => s.replace(
+  "    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;",
+  "    const ingressBase = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\n    const wsUrl = `${protocol}//${window.location.host}${ingressBase}/api/v1/ws`;"
+));
+JS
+
 WORKDIR /src/frontend
 RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
@@ -22,7 +90,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.4" \
+    io.hass.version="0.1.5" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

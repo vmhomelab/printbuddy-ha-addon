@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Fixed blank Home Assistant Ingress screens by building the SPA with relative asset URLs.
+- Rewrites frontend `/api`, `/img`, `/icons`, `/fonts`, manifest, service worker, and WebSocket URLs under the active `/api/hassio_ingress/<token>` prefix at runtime.
+
 ## 0.1.4
 
 - Fixed Home Assistant Ingress/Web UI embedding by exporting `TRUSTED_FRAME_ORIGINS` by default, which makes Printbuddy drop `X-Frame-Options` and use CSP `frame-ancestors 'self' ...` instead.
