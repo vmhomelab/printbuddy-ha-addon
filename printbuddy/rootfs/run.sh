@@ -30,6 +30,7 @@ LOG_LEVEL_VALUE="$(read_option log_level info)"
 PUID_VALUE="$(read_option puid 1000)"
 PGID_VALUE="$(read_option pgid 1000)"
 USE_SYSTEM_TRUST_STORE_VALUE="$(read_option use_system_trust_store false)"
+TRUSTED_FRAME_ORIGINS_VALUE="$(read_option trusted_frame_origins http://homeassistant.local:8123)"
 
 export DATA_DIR="${DATA_DIR:-/data/printbuddy}"
 export LOG_DIR="${LOG_DIR:-/data/logs}"
@@ -37,6 +38,10 @@ export PORT="${PORT:-8000}"
 export LOG_LEVEL="$(printf '%s' "$LOG_LEVEL_VALUE" | tr '[:lower:]' '[:upper:]')"
 export PUID="$PUID_VALUE"
 export PGID="$PGID_VALUE"
+
+if [ -n "$TRUSTED_FRAME_ORIGINS_VALUE" ]; then
+    export TRUSTED_FRAME_ORIGINS="$TRUSTED_FRAME_ORIGINS_VALUE"
+fi
 
 mkdir -p \
     "$DATA_DIR" \

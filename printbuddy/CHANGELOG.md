@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Fixed Home Assistant Ingress/Web UI embedding by exporting `TRUSTED_FRAME_ORIGINS` by default, which makes Printbuddy drop `X-Frame-Options` and use CSP `frame-ancestors 'self' ...` instead.
+- Added an add-on option to override trusted frame origins for custom Home Assistant URLs.
+
 ## 0.1.3
 
 - Fixed add-on startup permissions for persistent `/data/printbuddy` and `/data/logs` paths before dropping privileges.
