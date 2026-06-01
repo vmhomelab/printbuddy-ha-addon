@@ -33,7 +33,7 @@ export function printbuddyIngressBase(): string {
   return match?.[1] ?? '';
 }
 
-function printbuddyWithIngressBase(url: string): string {
+export function printbuddyWithIngressBase(url: string): string {
   const base = printbuddyIngressBase();
   if (!base || !url.startsWith('/') || url.startsWith('//') || url.startsWith(base + '/')) {
     return url;
@@ -75,12 +75,20 @@ edit('frontend/src/main.tsx', (s) => s.replace("import './i18n' // Initialize i1
 edit('frontend/src/App.tsx', (s) => s
   .replace("import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';", "import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';\nimport { printbuddyIngressBase } from './ha-ingress';")
   .replace('<BrowserRouter>', '<BrowserRouter basename={printbuddyIngressBase() || undefined}>')
+  .replace('                  <Route path="camera-tokens" element={<Navigate to="/settings?tab=apikeys#card-camera-tokens" replace />} />\n', '                  <Route path="camera-tokens" element={<Navigate to="/settings?tab=apikeys#card-camera-tokens" replace />} />\n                  <Route path="*" element={<Navigate to="/" replace />} />\n')
+);
+edit('frontend/src/contexts/AuthContext.tsx', (s) => s
+  .replace("import { api, getAuthToken, setAuthToken } from '../api/client';", "import { api, getAuthToken, setAuthToken } from '../api/client';\nimport { printbuddyIngressBase, printbuddyWithIngressBase } from '../ha-ingress';")
+  .replace('      const currentPath = window.location.pathname;', "      const currentPath = window.location.pathname.replace(printbuddyIngressBase(), '') || '/';")
+  .replace("        window.location.href = '/setup';", "        window.location.href = printbuddyWithIngressBase('/setup');")
+  .replace("    window.location.href = '/login';", "    window.location.href = printbuddyWithIngressBase('/login');")
 );
 edit('frontend/src/api/client.ts', (s) => s.replace("const API_BASE = '/api/v1';", "const INGRESS_BASE = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\nconst API_BASE = `${INGRESS_BASE}/api/v1`;"));
 edit('frontend/src/hooks/useWebSocket.ts', (s) => s.replace(
   "    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;",
   "    const ingressBase = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\n    const wsUrl = `${protocol}//${window.location.host}${ingressBase}/api/v1/ws`;"
 ));
+edit('frontend/index.html', (s) => s.replace('    <script src="/sw-register.js"></script>\n', ''));
 edit('backend/app/main.py', (s) => s.replace(
   `app = FastAPI(
     title=app_settings.app_name,
@@ -122,7 +130,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.7" \
+    io.hass.version="0.1.8" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

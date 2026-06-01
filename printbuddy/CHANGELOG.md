@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8
+
+- Fixed Ingress redirects that escaped Home Assistant by rewriting setup/login redirects through the active `/api/hassio_ingress/<token>` base path.
+- Added a React Router fallback to return stale or unknown Ingress routes to the dashboard instead of leaving the user on a 404.
+- Disabled service-worker registration in the Home Assistant add-on build to avoid PWA root-scope/cached-route interference under Ingress.
+
 ## 0.1.7
 
 - Fixed Home Assistant Ingress static asset loading when HA combines the Ingress token path with absolute asset URLs and forwards paths like `//assets/...`.
