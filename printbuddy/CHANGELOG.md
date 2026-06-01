@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7
+
+- Fixed Home Assistant Ingress static asset loading when HA combines the Ingress token path with absolute asset URLs and forwards paths like `//assets/...`.
+- Normalizes double-leading-slash request paths before FastAPI routing so `/assets`, `/sw-register.js`, manifest, icons, and other static files return their real MIME type instead of the SPA fallback HTML.
+
 ## 0.1.6
 
 - Fixed React Router matching under Home Assistant Ingress by setting the router basename to the active `/api/hassio_ingress/<token>` prefix.

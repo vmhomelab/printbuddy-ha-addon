@@ -81,6 +81,34 @@ edit('frontend/src/hooks/useWebSocket.ts', (s) => s.replace(
   "    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;",
   "    const ingressBase = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\n    const wsUrl = `${protocol}//${window.location.host}${ingressBase}/api/v1/ws`;"
 ));
+edit('backend/app/main.py', (s) => s.replace(
+  `app = FastAPI(
+    title=app_settings.app_name,
+    description="Archive and manage Bambu Lab 3MF files",
+    version=APP_VERSION,
+    lifespan=lifespan,
+)
+`,
+  `app = FastAPI(
+    title=app_settings.app_name,
+    description="Archive and manage Bambu Lab 3MF files",
+    version=APP_VERSION,
+    lifespan=lifespan,
+)
+
+
+@app.middleware("http")
+async def home_assistant_ingress_path_middleware(request, call_next):
+    """Normalize paths produced by HA Ingress prefix + absolute SPA assets."""
+    path = request.scope.get("path", "")
+    if isinstance(path, str) and path.startswith("//"):
+        request.scope["path"] = "/" + path.lstrip("/")
+        raw_path = request.scope.get("raw_path")
+        if isinstance(raw_path, (bytes, bytearray)) and raw_path.startswith(b"//"):
+            request.scope["raw_path"] = b"/" + bytes(raw_path).lstrip(b"/")
+    return await call_next(request)
+`
+));
 JS
 
 WORKDIR /src/frontend
@@ -94,7 +122,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.6" \
+    io.hass.version="0.1.7" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
