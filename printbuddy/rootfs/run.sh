@@ -38,7 +38,16 @@ export LOG_LEVEL="$(printf '%s' "$LOG_LEVEL_VALUE" | tr '[:lower:]' '[:upper:]')
 export PUID="$PUID_VALUE"
 export PGID="$PGID_VALUE"
 
-mkdir -p "$DATA_DIR" "$LOG_DIR"
+mkdir -p \
+    "$DATA_DIR" \
+    "$DATA_DIR/archive" \
+    "$DATA_DIR/plate_calibration" \
+    "$LOG_DIR"
+
+if [ "$(id -u)" -eq 0 ]; then
+    echo "[printbuddy-addon] chown -R ${PUID}:${PGID} ${DATA_DIR} ${LOG_DIR}"
+    chown -R "${PUID}:${PGID}" "$DATA_DIR" "$LOG_DIR" || true
+fi
 
 if [ "$USE_SYSTEM_TRUST_STORE_VALUE" = "true" ]; then
     if find /ssl -maxdepth 1 -type f -name '*.crt' 2>/dev/null | grep -q .; then

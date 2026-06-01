@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Fixed add-on startup permissions for persistent `/data/printbuddy` and `/data/logs` paths before dropping privileges.
+- Pre-creates Printbuddy runtime subdirectories such as `archive` and `plate_calibration` in the Home Assistant data volume.
+
 ## 0.1.2
 
 - Pinned the add-on runtime stage to a Debian Python base instead of Home Assistant's injected Alpine base image.
