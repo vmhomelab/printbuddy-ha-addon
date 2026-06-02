@@ -1,5 +1,5 @@
 name: Printbuddy
-version: "0.1.19"
+version: "0.1.20"
 slug: printbuddy
 description: Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers.
 url: https://github.com/vmhomelab/printbuddy-ha-addon
