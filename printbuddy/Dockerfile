@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=c9348e724b528b98d610ab7ad859eb82bd0e8495
+ARG PRINTBUDDY_REF=e32dab350b9adc6b9f6afcae1741f592e3ea464e
 WORKDIR /src
 
 RUN apt-get update \
@@ -29,6 +29,16 @@ const checks = {
   ],
   'backend/app/services/printer_manager.py': [
     'Skipping saved printer %s during startup: %s',
+  ],
+  'frontend/src/pages/PrintersPage.tsx': [
+    'const PRINTER_MODEL_GROUPS',
+    "label: 'Bambu Lab'",
+    "label: 'Elegoo'",
+    "value: 'Elegoo Neptune 4 Pro'",
+    "label: 'Voron'",
+    "value: 'Voron 2.4'",
+    "label: 'Creality Klipper'",
+    "value: 'Generic Klipper Printer'",
   ],
 };
 const missing = [];
@@ -156,7 +166,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=c9348e724b528b98d610ab7ad859eb82bd0e8495
+ARG PRINTBUDDY_REF=e32dab350b9adc6b9f6afcae1741f592e3ea464e
 
 LABEL \
     io.hass.name="Printbuddy" \
