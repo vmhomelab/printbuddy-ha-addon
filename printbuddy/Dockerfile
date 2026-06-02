@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=cdfeb482fd31529e3ba1a59ff7f8d7a777344c66
+ARG PRINTBUDDY_REF=7f0eff91c46439a0eda64a215d907e1d3b5d74af
 WORKDIR /src
 
 RUN apt-get update \
@@ -79,6 +79,9 @@ const checks = {
     'nozzle Z move',
     'move step [mm]',
     'extrude/retract step [mm]',
+    'bg-[var(--bg-secondary)]',
+    'text-[var(--text-primary)]',
+    'bg-[var(--bg-tertiary)]',
   ],
 };
 const missing = [];
@@ -206,13 +209,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=cdfeb482fd31529e3ba1a59ff7f8d7a777344c66
+ARG PRINTBUDDY_REF=7f0eff91c46439a0eda64a215d907e1d3b5d74af
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.24" \
+    io.hass.version="0.1.25" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

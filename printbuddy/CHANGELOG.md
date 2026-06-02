@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.25
+
+- Pinned the add-on build to Printbuddy commit `7f0eff91c46439a0eda64a215d907e1d3b5d74af`, which aligns the PrusaLink control card with the app's dark theme.
+- Replaced the hard black Prusa control background and fixed grey controls with theme-aware background, border, button, and text colors.
+
 ## 0.1.24
 
 - Pinned the add-on build to Printbuddy commit `cdfeb482fd31529e3ba1a59ff7f8d7a777344c66`, which includes the updated PrusaLink manual controls.
