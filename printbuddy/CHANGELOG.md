@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.26
+
+- Pinned the add-on build to Printbuddy commit `29e99e38f9388e2090583f341bdbb8a3d4d537e8`, which collapses manual controls on printer cards by default.
+- Keeps Klipper/Moonraker and PrusaLink printer cards uniform on the dashboard with a compact `Manual controls` disclosure row.
+- The full movement, extrusion, and temperature controls are still available after expanding the row.
+
 ## 0.1.25
 
 - Pinned the add-on build to Printbuddy commit `7f0eff91c46439a0eda64a215d907e1d3b5d74af`, which aligns the PrusaLink control card with the app's dark theme.
