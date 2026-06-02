@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.15
+
+- Pinned the Home Assistant add-on build to Printbuddy commit `bfb8c3d99215f925ea0a3bbaacd45e7b56aff9f9`, which includes Moonraker jog controls and nozzle/bed temperature controls.
+- Bumped add-on metadata so Home Assistant Supervisor can detect the update instead of only seeing the upstream app repository change.
+
 ## 0.1.8
 
 - Fixed Ingress redirects that escaped Home Assistant by rewriting setup/login redirects through the active `/api/hassio_ingress/<token>` base path.
