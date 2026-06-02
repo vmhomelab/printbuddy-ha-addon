@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.17
+
+- Fixed the add-on Docker build guard so the startup-fix marker is checked in `printer_manager.py` instead of the Moonraker provider file.
+- Keeps the same Printbuddy source ref as 0.1.16; this release only fixes the add-on build failure during update.
+
 ## 0.1.16
 
 - Pinned the add-on build to Printbuddy commit `c9348e724b528b98d610ab7ad859eb82bd0e8495`, which prevents one unreachable saved printer from aborting Home Assistant add-on startup.
