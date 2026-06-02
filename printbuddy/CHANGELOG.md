@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.24
+
+- Pinned the add-on build to Printbuddy commit `cdfeb482fd31529e3ba1a59ff7f8d7a777344c66`, which includes the updated PrusaLink manual controls.
+- Added the Prusa-style control panel layout with printer coordinates, stepper controls, XY/Z movement, and extrude/retract step controls.
+- Uses PrusaLink-native printhead and tool endpoints for jog, home, disable steppers, extrusion, and temperature commands.
+
 ## 0.1.17
 
 - Fixed the add-on Docker build guard so the startup-fix marker is checked in `printer_manager.py` instead of the Moonraker provider file.
