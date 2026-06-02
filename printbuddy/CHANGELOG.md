@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.16
+
+- Pinned the add-on build to Printbuddy commit `c9348e724b528b98d610ab7ad859eb82bd0e8495`, which prevents one unreachable saved printer from aborting Home Assistant add-on startup.
+- Startup now logs and skips unreachable saved printers so the web app can still open and the printer can be fixed from the UI.
+
 ## 0.1.15
 
 - Pinned the Home Assistant add-on build to Printbuddy commit `bfb8c3d99215f925ea0a3bbaacd45e7b56aff9f9`, which includes Moonraker jog controls and nozzle/bed temperature controls.

@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=bfb8c3d99215f925ea0a3bbaacd45e7b56aff9f9
+ARG PRINTBUDDY_REF=c9348e724b528b98d610ab7ad859eb82bd0e8495
 WORKDIR /src
 
 RUN apt-get update \
@@ -26,6 +26,7 @@ const required = [
   'self._post("printer/gcode/script", {"script": script})',
   'def set_nozzle_temperature(self, target: int | float) -> bool:',
   'def set_bed_temperature(self, target: int | float) -> bool:',
+  'Skipping saved printer %s during startup: %s',
 ];
 const missing = required.filter((needle) => !source.includes(needle));
 if (missing.length) {
@@ -146,13 +147,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=bfb8c3d99215f925ea0a3bbaacd45e7b56aff9f9
+ARG PRINTBUDDY_REF=c9348e724b528b98d610ab7ad859eb82bd0e8495
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.15" \
+    io.hass.version="0.1.16" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
