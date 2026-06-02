@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=8d788c0a25167a65b142b7d881452ca05b9c2687
+ARG PRINTBUDDY_REF=1e9c80fce2efc0fa085e5da272e66465dcde40e6
 WORKDIR /src
 
 RUN apt-get update \
@@ -44,6 +44,15 @@ const checks = {
     "<option value=\"prusalink\">Prusa</option>",
     'provider={form.provider}',
     "value: 'Generic Klipper Printer'",
+  ],
+  'frontend/src/utils/assetPaths.ts': [
+    'appAssetPath',
+    'hassio_ingress',
+  ],
+  'frontend/src/components/Layout.tsx': [
+    'appAssetPath',
+    'printbuddy_logo_dark.png',
+    'printbuddy_logo_light.png',
   ],
   'backend/app/services/printer_providers/prusalink.py': [
     'class PrusaLinkPrinterClient',
@@ -181,13 +190,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=8d788c0a25167a65b142b7d881452ca05b9c2687
+ARG PRINTBUDDY_REF=1e9c80fce2efc0fa085e5da272e66465dcde40e6
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.22" \
+    io.hass.version="0.1.23" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
