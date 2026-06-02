@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.27
+
+- Pinned the add-on build to Printbuddy commit `8a5b10fa6d1181c70f2a871c7f9ebff8203ece28`, which themes the Klipper/Moonraker and PrusaLink manual control buttons.
+- Replaced the hardcoded Klipper red jog buttons and Prusa orange accents with the active Printbuddy accent color.
+- Updated movement, home, extrude/retract, temperature set, and step buttons so they follow the configured theme consistently.
+
 ## 0.1.26
 
 - Pinned the add-on build to Printbuddy commit `29e99e38f9388e2090583f341bdbb8a3d4d537e8`, which collapses manual controls on printer cards by default.
