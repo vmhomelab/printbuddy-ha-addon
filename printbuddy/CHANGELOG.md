@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.28
+
+- Pinned the add-on build to Printbuddy commit `c4b7ef72a35b7a582641d5f56912ed36ce4a3d64`, which removes the redundant PrusaLink manual-control title.
+- The expanded PrusaLink manual control area now starts directly with coordinates, stepper, movement, and extrusion sections instead of showing `<printer name> printer control`.
+- Keeps the latest PrusaLink controls, printer file upload, and queue-from-printer-file changes available through the Home Assistant add-on build.
+
 ## 0.1.27
 
 - Pinned the add-on build to Printbuddy commit `8a5b10fa6d1181c70f2a871c7f9ebff8203ece28`, which themes the Klipper/Moonraker and PrusaLink manual control buttons.

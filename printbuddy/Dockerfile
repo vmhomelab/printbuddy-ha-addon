@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=29e99e38f9388e2090583f341bdbb8a3d4d537e8
+ARG PRINTBUDDY_REF=c4b7ef72a35b7a582641d5f56912ed36ce4a3d64
 WORKDIR /src
 
 RUN apt-get update \
@@ -72,6 +72,7 @@ const checks = {
   ],
   'frontend/src/components/KlipperControlPanel.tsx': [
     "printer.provider === 'prusalink'",
+    "!<span className=\"text-[var(--accent)]\">{printer.name}</span> printer control",
     'printer coordinates',
     'stepper motors',
     'disable steppers',
@@ -94,7 +95,12 @@ const missing = [];
 for (const [path, required] of Object.entries(checks)) {
   const source = fs.readFileSync(path, 'utf8');
   for (const needle of required) {
-    if (!source.includes(needle)) missing.push(`${path}: ${needle}`);
+    if (needle.startsWith('!')) {
+      const forbidden = needle.slice(1);
+      if (source.includes(forbidden)) missing.push(`${path}: forbidden stale marker still present: ${forbidden}`);
+    } else if (!source.includes(needle)) {
+      missing.push(`${path}: ${needle}`);
+    }
   }
 }
 if (missing.length) {
@@ -215,13 +221,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=29e99e38f9388e2090583f341bdbb8a3d4d537e8
+ARG PRINTBUDDY_REF=c4b7ef72a35b7a582641d5f56912ed36ce4a3d64
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.26" \
+    io.hass.version="0.1.28" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
