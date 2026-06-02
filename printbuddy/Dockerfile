@@ -17,20 +17,29 @@ RUN curl -fsSL "https://github.com/vmhomelab/Printbuddy/archive/${PRINTBUDDY_REF
 # AttributeError: hms_errors/raw_data at runtime.
 RUN node - <<'JS'
 const fs = require('fs');
-const source = fs.readFileSync('backend/app/services/printer_providers/moonraker.py', 'utf8');
-const required = [
-  'raw_data: dict[str, Any] = field(default_factory=dict)',
-  'hms_errors: list[Any] = field(default_factory=list)',
-  'return self.state.connected',
-  'def send_gcode(self, script: str) -> bool:',
-  'self._post("printer/gcode/script", {"script": script})',
-  'def set_nozzle_temperature(self, target: int | float) -> bool:',
-  'def set_bed_temperature(self, target: int | float) -> bool:',
-  'Skipping saved printer %s during startup: %s',
-];
-const missing = required.filter((needle) => !source.includes(needle));
+const checks = {
+  'backend/app/services/printer_providers/moonraker.py': [
+    'raw_data: dict[str, Any] = field(default_factory=dict)',
+    'hms_errors: list[Any] = field(default_factory=list)',
+    'return self.state.connected',
+    'def send_gcode(self, script: str) -> bool:',
+    'self._post("printer/gcode/script", {"script": script})',
+    'def set_nozzle_temperature(self, target: int | float) -> bool:',
+    'def set_bed_temperature(self, target: int | float) -> bool:',
+  ],
+  'backend/app/services/printer_manager.py': [
+    'Skipping saved printer %s during startup: %s',
+  ],
+};
+const missing = [];
+for (const [path, required] of Object.entries(checks)) {
+  const source = fs.readFileSync(path, 'utf8');
+  for (const needle of required) {
+    if (!source.includes(needle)) missing.push(`${path}: ${needle}`);
+  }
+}
 if (missing.length) {
-  throw new Error(`Downloaded Printbuddy source is missing Moonraker fixes: ${missing.join(', ')}`);
+  throw new Error(`Downloaded Printbuddy source is missing required fixes: ${missing.join(', ')}`);
 }
 JS
 
@@ -153,7 +162,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper, and Mainsail/Moonraker printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.16" \
+    io.hass.version="0.1.17" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
