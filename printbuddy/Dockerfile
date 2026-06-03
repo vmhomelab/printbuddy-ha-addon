@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641
+ARG PRINTBUDDY_REF=dc56f290993edb9705196a01b958c6ed87a3c9bb
 WORKDIR /src
 
 RUN apt-get update \
@@ -51,6 +51,15 @@ const checks = {
     'Only {{extensions}} files can be printed on this printer',
     'accept={printableFileRules.accept}',
     'acceptedFileDescription={printableFileDescription}',
+    'const fanItems = [',
+    "value: status.big_fan2_speed",
+    "value: status.heatbreak_fan_speed",
+    't(\'printers.fans.heatbreak\')',
+    '].filter((fan) => fan.value !== null && fan.value !== undefined)',
+    "{t('printers.indicators')}",
+    '!showBedJogMenu',
+    '!bedJogMutation',
+    '!Move build plate',
     '<Collapsible',
     'defaultOpen={false}',
     'Manual controls',
@@ -238,13 +247,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641
+ARG PRINTBUDDY_REF=dc56f290993edb9705196a01b958c6ed87a3c9bb
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.29" \
+    io.hass.version="0.1.30" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

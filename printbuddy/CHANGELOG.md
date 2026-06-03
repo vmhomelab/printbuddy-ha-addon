@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.30
+
+- Pinned the add-on build to Printbuddy commit `dc56f290993edb9705196a01b958c6ed87a3c9bb`, which refines the expanded printer card status/print-action strip.
+- Renamed that strip from Controls/Steuerung to Status so it no longer duplicates the separate manual controls section below.
+- Fan percentage badges now only appear for fan capabilities reported by the printer; unsupported fans such as a missing chamber fan stay hidden, while supported fans at `0%` still display.
+- Removed the compact bed-jog button from the status strip; Stop and Pause/Resume remain there, with movement controls kept in the manual controls section.
+
 ## 0.1.29
 
 - Pinned the add-on build to Printbuddy commit `f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641`, which includes provider-specific print upload file handling and the latest PrusaLink manual-control layout.
