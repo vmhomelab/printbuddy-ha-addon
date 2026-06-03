@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=12e0113043b6a19c95842ca85d321fd204cb3597
+ARG PRINTBUDDY_REF=2001ada2188424acf4154dfc8f499ec72156c62d
 WORKDIR /src
 
 RUN apt-get update \
@@ -289,13 +289,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=12e0113043b6a19c95842ca85d321fd204cb3597
+ARG PRINTBUDDY_REF=2001ada2188424acf4154dfc8f499ec72156c62d
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.35" \
+    io.hass.version="0.1.36" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
