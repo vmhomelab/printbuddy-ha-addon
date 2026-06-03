@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.33
+
+- Pinned the add-on build to Printbuddy commit `a363c9931949f5ead86cf31a42b8c07296e43aac`, which fixes non-Bambu printer artwork previews.
+- Elegoo Neptune 4 Pro and Prusa MK4S now resolve to their bundled printer images in add/edit previews, printer cards, and the printer info modal instead of falling back to the default image.
+- Added build-time guards so stale add-on builds fail if the non-Bambu artwork aliases or assets are missing.
+
 ## 0.1.32
 
 - Pinned the add-on build to Printbuddy commit `752071b006fb469792abe45f17e7cb023bb6d148`, which adds model-specific printer artwork selection from `/static/img/printers`.
