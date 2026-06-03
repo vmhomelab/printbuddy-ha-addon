@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.34
+
+- Pinned the add-on build to Printbuddy commit `9c9ac9c4e02b922c9e711d7fa4564e47ce4ba598`, which keeps the non-Bambu printer artwork preview fix and satisfies backend import-order CI.
+- Keeps the Elegoo Neptune 4 Pro and Prusa MK4S artwork aliases/assets available through the Home Assistant add-on build.
+
 ## 0.1.33
 
 - Pinned the add-on build to Printbuddy commit `a363c9931949f5ead86cf31a42b8c07296e43aac`, which fixes non-Bambu printer artwork previews.
