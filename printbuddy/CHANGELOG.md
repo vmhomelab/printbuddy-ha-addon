@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.32
+
+- Pinned the add-on build to Printbuddy commit `752071b006fb469792abe45f17e7cb023bb6d148`, which adds model-specific printer artwork selection from `/static/img/printers`.
+- Printer cards, the printer info modal, and add/edit printer dialogs now resolve the selected model to the matching artwork and fall back to `default.png` if an image is missing.
+- Added Bambu model choices for A1 F and the O1 family so those new artwork files can be selected directly.
+
 ## 0.1.31
 
 - Pinned the add-on build to Printbuddy commit `bb425cccdeb12f5cece72468c607e3921f0132a9`, which brings the printer-card fan/status refinements to Klipper/Moonraker printers as well.

@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=bb425cccdeb12f5cece72468c607e3921f0132a9
+ARG PRINTBUDDY_REF=752071b006fb469792abe45f17e7cb023bb6d148
 WORKDIR /src
 
 RUN apt-get update \
@@ -51,6 +51,13 @@ const checks = {
     'Only {{extensions}} files can be printed on this printer',
     'accept={printableFileRules.accept}',
     'acceptedFileDescription={printableFileDescription}',
+    'PrinterModelImagePreview',
+    'getDefaultPrinterImage',
+    "value: 'A1 F'",
+    "value: 'O1C'",
+    "value: 'O1E'",
+    "value: 'O1S'",
+    '<PrinterModelImagePreview model={form.model} />',
     'const fanItems = [',
     "value: status.big_fan2_speed",
     "value: status.heatbreak_fan_speed",
@@ -72,6 +79,16 @@ const checks = {
     "extensions: ['.bgcode', '.gcode', '.gco', '.g']",
     'getPrinterFileRuleSet',
     'isPrintableForProvider',
+  ],
+  'frontend/src/utils/printer.ts': [
+    'appAssetPath',
+    'MODEL_IMAGE_ALIASES',
+    'getDefaultPrinterImage',
+    'normalizePrinterModel',
+    "[/^a1f$/, 'a1f']",
+    "[/^o1c$/, 'o1c']",
+    "[/^o1e$/, 'o1e']",
+    "[/^o1s$/, 'o1s']",
   ],
   'frontend/src/utils/assetPaths.ts': [
     'appAssetPath',
@@ -127,6 +144,18 @@ const checks = {
   ],
 };
 const missing = [];
+const requiredFiles = [
+  'static/img/printers/a1f.png',
+  'static/img/printers/a1mini.png',
+  'static/img/printers/o1c.png',
+  'static/img/printers/o1e.png',
+  'static/img/printers/o1s.png',
+  'static/img/printers/h2dpro.png',
+  'static/img/printers/default.png',
+];
+for (const file of requiredFiles) {
+  if (!fs.existsSync(file)) missing.push(`${file}: missing printer artwork asset`);
+}
 for (const [path, required] of Object.entries(checks)) {
   const source = fs.readFileSync(path, 'utf8');
   for (const needle of required) {
@@ -256,13 +285,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=bb425cccdeb12f5cece72468c607e3921f0132a9
+ARG PRINTBUDDY_REF=752071b006fb469792abe45f17e7cb023bb6d148
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.31" \
+    io.hass.version="0.1.32" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
