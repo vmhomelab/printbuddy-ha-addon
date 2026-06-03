@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=c4b7ef72a35b7a582641d5f56912ed36ce4a3d64
+ARG PRINTBUDDY_REF=f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641
 WORKDIR /src
 
 RUN apt-get update \
@@ -44,6 +44,25 @@ const checks = {
     "<option value=\"prusalink\">Prusa</option>",
     'provider={form.provider}',
     "value: 'Generic Klipper Printer'",
+    'getPrinterFileRuleSet',
+    'isPrintableForProvider',
+    'printers.printUploadAccepts',
+    'Printable files for this printer: {{extensions}}',
+    'Only {{extensions}} files can be printed on this printer',
+    'accept={printableFileRules.accept}',
+    'acceptedFileDescription={printableFileDescription}',
+    '<Collapsible',
+    'defaultOpen={false}',
+    'Manual controls',
+    "printer.provider === 'prusalink' ? 'PrusaLink movement and extrusion' : 'Klipper movement, extrusion, and temperatures'",
+  ],
+  'frontend/src/utils/printerFileRules.ts': [
+    'accept: \'.3mf,.gcode.3mf\'',
+    "extensions: ['.3mf', '.gcode.3mf']",
+    'accept: \'.bgcode,.gcode,.gco,.g\'',
+    "extensions: ['.bgcode', '.gcode', '.gco', '.g']",
+    'getPrinterFileRuleSet',
+    'isPrintableForProvider',
   ],
   'frontend/src/utils/assetPaths.ts': [
     'appAssetPath',
@@ -73,22 +92,20 @@ const checks = {
   'frontend/src/components/KlipperControlPanel.tsx': [
     "printer.provider === 'prusalink'",
     "!<span className=\"text-[var(--accent)]\">{printer.name}</span> printer control",
-    'printer coordinates',
-    'stepper motors',
-    'disable steppers',
-    'heated bed X and Y move',
-    'nozzle Z move',
-    'move step [mm]',
-    'extrude/retract step [mm]',
+    'const prusaBusy = moveMut.isPending || homeMut.isPending || disableSteppersMut.isPending',
+    'onClick={() => homeMut.mutate(undefined)}',
+    "onClick={() => homeMut.mutate(['x', 'y'])}",
+    "onClick={() => homeMut.mutate(['z'])}",
+    "onClick={() => moveMut.mutate({ axis: 'z', distance: xyStep })}",
+    "onClick={() => moveMut.mutate({ axis: 'z', distance: -xyStep })}",
+    "t('printers.klipper.extrusionLength', 'Extrusion length')",
+    "t('printers.klipper.extrusionSpeed', 'Extrusion speed')",
+    "t('printers.klipper.nozzle', 'Nozzle')",
+    "t('printers.klipper.bed', 'Bed')",
+    'Stepper motors',
+    'Disable steppers',
     'bg-[var(--bg-secondary)]',
-    'text-[var(--text-primary)]',
     'bg-[var(--bg-tertiary)]',
-  ],
-  'frontend/src/pages/PrintersPage.tsx': [
-    '<Collapsible',
-    'defaultOpen={false}',
-    'Manual controls',
-    "printer.provider === 'prusalink' ? 'PrusaLink movement and extrusion' : 'Klipper movement, extrusion, and temperatures'",
   ],
 };
 const missing = [];
@@ -221,13 +238,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=c4b7ef72a35b7a582641d5f56912ed36ce4a3d64
+ARG PRINTBUDDY_REF=f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.28" \
+    io.hass.version="0.1.29" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

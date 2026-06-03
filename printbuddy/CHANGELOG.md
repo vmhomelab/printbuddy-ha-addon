@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.29
+
+- Pinned the add-on build to Printbuddy commit `f0f5fed73cc5a5c3f71d5eb6ee37a628c4f9a641`, which includes provider-specific print upload file handling and the latest PrusaLink manual-control layout.
+- The printer card print/upload dialog now shows and accepts the file types required by the selected printer provider, for example Bambu `.3mf` / `.gcode.3mf`, Prusa `.bgcode` / G-code, and Klipper-style G-code files.
+- PrusaLink manual controls now visually match the Klipper/Moonraker control layout while keeping PrusaLink-native backend commands.
+
 ## 0.1.28
 
 - Pinned the add-on build to Printbuddy commit `c4b7ef72a35b7a582641d5f56912ed36ce4a3d64`, which removes the redundant PrusaLink manual-control title.
