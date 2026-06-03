@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.31
+
+- Pinned the add-on build to Printbuddy commit `bb425cccdeb12f5cece72468c607e3921f0132a9`, which brings the printer-card fan/status refinements to Klipper/Moonraker printers as well.
+- Moonraker fan badges now come from reported Klipper fan objects, including part cooling, auxiliary, chamber/exhaust, and hotend heatbreak fans where present.
+- Missing Moonraker fans remain hidden while an existing fan at `0%` is still displayed, matching the Prusa/Bambu status strip behavior.
+
 ## 0.1.30
 
 - Pinned the add-on build to Printbuddy commit `dc56f290993edb9705196a01b958c6ed87a3c9bb`, which refines the expanded printer card status/print-action strip.
