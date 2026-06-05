@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.43
+
+- Pinned the add-on build to Printbuddy commit `fa4bed6345bfa417599ffdaefdb37cb08876b2f2`, which fixes printer-card camera buttons for configured external cameras.
+- External camera buttons now open the clicked printer's `/camera/<printer_id>` route even when the printer API status is offline, while still requiring `camera:view` permission.
+- Added a build-time guard so stale add-on builds fail if the printer-card external-camera mapping fix is missing.
+
 ## 0.1.42
 
 - Pinned the add-on build to Printbuddy commit `e1c0b2ebe286317afb1fd6d63fbff06aab30909f`, which also shows the source revision in the Settings → Updates current-version field.
