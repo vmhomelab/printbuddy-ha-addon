@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.42
+
+- Pinned the add-on build to Printbuddy commit `e1c0b2ebe286317afb1fd6d63fbff06aab30909f`, which also shows the source revision in the Settings → Updates current-version field.
+- The sidebar footer and settings page now both use `display_version`, for example `v0.2.4.3 (e1c0b2e)`, so the UI no longer shows only the static semantic version.
+- Kept the generic printer artwork mapping from the latest app build.
+
 ## 0.1.41
 
 - Pinned the add-on build to Printbuddy commit `189f81edc7cbcf82cebd5affa51612ad33d443f6`, which surfaces the running repository revision in the sidebar footer.

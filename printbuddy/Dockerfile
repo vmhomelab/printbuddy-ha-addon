@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=189f81edc7cbcf82cebd5affa51612ad33d443f6
+ARG PRINTBUDDY_REF=e1c0b2ebe286317afb1fd6d63fbff06aab30909f
 WORKDIR /src
 
 RUN apt-get update \
@@ -118,6 +118,7 @@ const checks = {
     "[/^elegooneptune4max$/, 'elegoo-neptune-4-max']",
     "[/^prusacoreone$/, 'prusa-core-one']",
     "[/^prusamk4s$/, 'prusa-mk4s']",
+    "[/^(?:klipper|prusalink|genericklipperprinter|genericfdmprinter)$/, 'generic-printer']",
   ],
   'frontend/src/utils/assetPaths.ts': [
     'appAssetPath',
@@ -127,6 +128,9 @@ const checks = {
     'appAssetPath',
     'printbuddy_logo_dark.png',
     'printbuddy_logo_light.png',
+    "versionInfo?.display_version || versionInfo?.version || '...'",
+  ],
+  'frontend/src/pages/SettingsPage.tsx': [
     "versionInfo?.display_version || versionInfo?.version || '...'",
   ],
   'backend/app/api/routes/updates.py': [
@@ -191,6 +195,7 @@ const requiredFiles = [
   'static/img/printers/h2dpro.png',
   'static/img/printers/elegoo-neptune-4-pro.png',
   'static/img/printers/prusa-mk4s.png',
+  'static/img/printers/generic-printer.png',
   'static/img/printers/default.png',
 ];
 for (const file of requiredFiles) {
@@ -325,13 +330,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=189f81edc7cbcf82cebd5affa51612ad33d443f6
+ARG PRINTBUDDY_REF=e1c0b2ebe286317afb1fd6d63fbff06aab30909f
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.41" \
+    io.hass.version="0.1.42" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
