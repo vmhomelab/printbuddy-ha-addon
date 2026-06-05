@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=1f99b9c632cfeed616df8c98654ac0f981f58680
+ARG PRINTBUDDY_REF=68e3fc0effcb5cc8f9c4575d923093758282f96d
 WORKDIR /src
 
 RUN apt-get update \
@@ -138,6 +138,10 @@ const checks = {
   ],
   'frontend/src/pages/SettingsPage.tsx': [
     "versionInfo?.display_version || versionInfo?.version || '...'",
+    'function inferExternalCameraType(url: string): string',
+    'external_camera_enabled: true',
+    'external_camera_type: inferExternalCameraType(trimmedUrl)',
+    'external_camera_enabled: false',
   ],
   'backend/app/api/routes/updates.py': [
     'def _get_source_ref() -> str | None:',
@@ -171,8 +175,12 @@ const checks = {
   ],
   'backend/app/api/routes/printers.py': [
     '/{printer_id}/disable-steppers',
+    'normalize_external_camera_update(printer_data.model_dump(exclude_unset=True))',
   ],
   'backend/app/schemas/printer.py': [
+    'def infer_external_camera_type(camera_url: str) -> str:',
+    'def normalize_external_camera_update(update_data: dict) -> dict:',
+    'update_data.setdefault("external_camera_enabled", True)',
     'data["external_camera_url"] = None',
     'data["external_camera_type"] = None',
     'data["external_camera_enabled"] = False',
@@ -342,13 +350,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=1f99b9c632cfeed616df8c98654ac0f981f58680
+ARG PRINTBUDDY_REF=68e3fc0effcb5cc8f9c4575d923093758282f96d
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.44" \
+    io.hass.version="0.1.45" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.45
+
+- Pinned the add-on build to Printbuddy commit `68e3fc0effcb5cc8f9c4575d923093758282f96d`, which fixes external cameras added from Settings.
+- Settings now saves the camera URL together with `external_camera_enabled` and an inferred camera type, so the camera button opens the configured external stream.
+- Added build-time guards so stale add-on builds fail if the Settings/API camera-normalization fix is missing.
+
 ## 0.1.44
 
 - Pinned the add-on build to Printbuddy commit `1f99b9c632cfeed616df8c98654ac0f981f58680`, which makes the setup Camera URL optional for non-Bambu printers.
