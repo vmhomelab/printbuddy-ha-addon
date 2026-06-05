@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=368f6a5364d69de1069db6c5e4739759a19109ea
+ARG PRINTBUDDY_REF=bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53
 WORKDIR /src
 
 RUN apt-get update \
@@ -26,6 +26,10 @@ const checks = {
     'self._post("printer/gcode/script", {"script": script})',
     'def set_nozzle_temperature(self, target: int | float) -> bool:',
     'def set_bed_temperature(self, target: int | float) -> bool:',
+    'def _normalize_gcodes_path(self, remote_path: str) -> str:',
+    '/home/mks/gcode_files',
+    '/home/mks/printer_data/gcodes',
+    'normalized == "/model" or normalized == "model"',
   ],
   'backend/app/services/printer_manager.py': [
     'Skipping saved printer %s during startup: %s',
@@ -94,7 +98,11 @@ const checks = {
     "[/^o1c$/, 'o1c']",
     "[/^o1e$/, 'o1e']",
     "[/^o1s$/, 'o1s']",
+    "[/^elegooneptune3$/, 'elegoo-neptune-3']",
+    "[/^elegooneptune3pro$/, 'elegoo-neptune-3-pro']",
     "[/^elegooneptune4pro$/, 'elegoo-neptune-4-pro']",
+    "[/^elegooneptune4max$/, 'elegoo-neptune-4-max']",
+    "[/^prusacoreone$/, 'prusa-core-one']",
     "[/^prusamk4s$/, 'prusa-mk4s']",
   ],
   'frontend/src/utils/assetPaths.ts': [
@@ -296,13 +304,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=368f6a5364d69de1069db6c5e4739759a19109ea
+ARG PRINTBUDDY_REF=bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.38" \
+    io.hass.version="0.1.39" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

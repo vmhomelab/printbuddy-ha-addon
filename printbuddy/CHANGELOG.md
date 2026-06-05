@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.39
+
+- Pinned the add-on build to Printbuddy commit `bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53`, which maps Elegoo `/model` file paths to Moonraker's `gcodes` root.
+- Elegoo file operations now normalize `/model/...`, `/home/mks/gcode_files/...`, and `/home/mks/printer_data/gcodes/...` before list/upload/download/delete/start-print calls.
+- Keeps the expanded Elegoo and Prusa model artwork mappings available in the Home Assistant add-on build.
+
 ## 0.1.38
 
 - Pinned the add-on build to Printbuddy commit `368f6a5364d69de1069db6c5e4739759a19109ea`, which improves Elegoo/Fluidd Moonraker connection probing.
