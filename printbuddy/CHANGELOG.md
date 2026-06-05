@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.46
+
+- Pinned the add-on build to Printbuddy commit `f70ddc3ff16b588581b4a713bff81ac84a8bbcd5`, which fixes the remaining existing-printer external-camera stream issue.
+- A successful Settings camera test now immediately saves the working live-stream fields (`external_camera_url`, `external_camera_enabled`, and `external_camera_type`) instead of relying on the delayed input-save path.
+- This fixes the log pattern where `/camera/external/test` succeeded but opening the existing printer camera never reached `/camera/stream` because the saved printer record was still stale.
+
 ## 0.1.45
 
 - Pinned the add-on build to Printbuddy commit `68e3fc0effcb5cc8f9c4575d923093758282f96d`, which fixes external cameras added from Settings.

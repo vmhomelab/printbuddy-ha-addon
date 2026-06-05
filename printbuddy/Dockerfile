@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=68e3fc0effcb5cc8f9c4575d923093758282f96d
+ARG PRINTBUDDY_REF=f70ddc3ff16b588581b4a713bff81ac84a8bbcd5
 WORKDIR /src
 
 RUN apt-get update \
@@ -139,7 +139,12 @@ const checks = {
   'frontend/src/pages/SettingsPage.tsx': [
     "versionInfo?.display_version || versionInfo?.version || '...'",
     'function inferExternalCameraType(url: string): string',
+    'const handleTestExternalCamera = async (printerId: number, url: string, cameraType: string) => {',
+    'const trimmedUrl = url.trim();',
+    'data: { external_camera_snapshot_url: trimmedUrl }',
+    'external_camera_url: trimmedUrl',
     'external_camera_enabled: true',
+    'external_camera_type: cameraType || inferExternalCameraType(trimmedUrl)',
     'external_camera_type: inferExternalCameraType(trimmedUrl)',
     'external_camera_enabled: false',
   ],
@@ -350,13 +355,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=68e3fc0effcb5cc8f9c4575d923093758282f96d
+ARG PRINTBUDDY_REF=f70ddc3ff16b588581b4a713bff81ac84a8bbcd5
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.45" \
+    io.hass.version="0.1.46" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
