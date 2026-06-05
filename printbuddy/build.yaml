@@ -2,4 +2,4 @@ build_from:
   amd64: python:3.12-slim-bookworm
   aarch64: python:3.12-slim-bookworm
 args:
-  PRINTBUDDY_REF: 2001ada2188424acf4154dfc8f499ec72156c62d
+  PRINTBUDDY_REF: b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2

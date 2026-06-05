@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=2001ada2188424acf4154dfc8f499ec72156c62d
+ARG PRINTBUDDY_REF=b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2
 WORKDIR /src
 
 RUN apt-get update \
@@ -29,6 +29,11 @@ const checks = {
   ],
   'backend/app/services/printer_manager.py': [
     'Skipping saved printer %s during startup: %s',
+  ],
+  'frontend/src/pages/SetupPage.tsx': [
+    "appAssetPath('/img/printbuddy_icon.png')",
+    'Printbuddy app icon',
+    'Bambu Lab · Klipper · Mainsail',
   ],
   'frontend/src/pages/PrintersPage.tsx': [
     'const PRINTER_MODEL_GROUPS',
@@ -289,13 +294,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=2001ada2188424acf4154dfc8f499ec72156c62d
+ARG PRINTBUDDY_REF=b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.36" \
+    io.hass.version="0.1.37" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

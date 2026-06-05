@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.37
+
+- Pinned the add-on build to Printbuddy commit `b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2`, which fixes the setup window branding to use the correct Printbuddy app icon.
+- Added a build-time guard so stale add-on builds fail if the setup page falls back to the old logo asset.
+
 ## 0.1.36
 
 - Pinned the add-on build to Printbuddy commit `2001ada2188424acf4154dfc8f499ec72156c62d`, which keeps the non-Bambu artwork preview fix and applies final backend formatting required by CI.
