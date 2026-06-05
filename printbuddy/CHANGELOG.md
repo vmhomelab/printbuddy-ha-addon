@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.44
+
+- Pinned the add-on build to Printbuddy commit `1f99b9c632cfeed616df8c98654ac0f981f58680`, which makes the setup Camera URL optional for non-Bambu printers.
+- Klipper/Moonraker/Fluidd/PrusaLink printers can now be added without a camera; camera fields stay disabled until a URL is provided.
+- Added build-time guards so stale add-on builds fail if the old required-camera setup behavior returns.
+
 ## 0.1.43
 
 - Pinned the add-on build to Printbuddy commit `fa4bed6345bfa417599ffdaefdb37cb08876b2f2`, which fixes printer-card camera buttons for configured external cameras.

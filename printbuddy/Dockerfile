@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=fa4bed6345bfa417599ffdaefdb37cb08876b2f2
+ARG PRINTBUDDY_REF=1f99b9c632cfeed616df8c98654ac0f981f58680
 WORKDIR /src
 
 RUN apt-get update \
@@ -87,6 +87,8 @@ const checks = {
     "const canOpenCamera = hasPermission('camera:view') && (isConnected || hasExternalCamera);",
     'disabled={!canOpenCamera}',
     "aria-label={cameraViewMode === 'embedded' ? t('printers.openCameraOverlay') : t('printers.openCameraWindow')}",
+    'Optional for non-Bambu printers. Add a camera stream or snapshot URL if available',
+    '!Required for non-Bambu printers. Use the camera stream or snapshot URL',
   ],
   'frontend/src/components/SliceModal.tsx': [
     'function pickFilamentForLoadedSpool',
@@ -169,6 +171,12 @@ const checks = {
   ],
   'backend/app/api/routes/printers.py': [
     '/{printer_id}/disable-steppers',
+  ],
+  'backend/app/schemas/printer.py': [
+    'data["external_camera_url"] = None',
+    'data["external_camera_type"] = None',
+    'data["external_camera_enabled"] = False',
+    '!external_camera_url is required for non-Bambu printers',
   ],
   'frontend/src/components/KlipperControlPanel.tsx': [
     "printer.provider === 'prusalink'",
@@ -334,13 +342,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=fa4bed6345bfa417599ffdaefdb37cb08876b2f2
+ARG PRINTBUDDY_REF=1f99b9c632cfeed616df8c98654ac0f981f58680
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.43" \
+    io.hass.version="0.1.44" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
