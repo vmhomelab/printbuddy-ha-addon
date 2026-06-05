@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.41
+
+- Pinned the add-on build to Printbuddy commit `189f81edc7cbcf82cebd5affa51612ad33d443f6`, which surfaces the running repository revision in the sidebar footer.
+- The footer now displays the app version plus the short source commit, for example `v0.2.4.3 (189f81e)`, so Home Assistant add-on builds no longer look like the old static upstream version only.
+- Added build-time guards so stale add-on builds fail if the version endpoint or footer display falls back to the old version-only behavior.
+
 ## 0.1.40
 
 - Pinned the add-on build to Printbuddy commit `1a593e7b9440ce692cf7eddb8006d8f45add755f`, which adds non-AMS loaded-spool assignment support.
