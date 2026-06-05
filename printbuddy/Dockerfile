@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2
+ARG PRINTBUDDY_REF=368f6a5364d69de1069db6c5e4739759a19109ea
 WORKDIR /src
 
 RUN apt-get update \
@@ -127,6 +127,8 @@ const checks = {
     'heater_fan ',
     'state.cooling_fan_speed = None',
     'state.heatbreak_fan_speed = percent',
+    'Some Elegoo/Fluidd images do the inverse',
+    'Therefore an explicit :7125 URL also gets a no-port fallback',
   ],
   'backend/app/api/routes/printers.py': [
     '/{printer_id}/disable-steppers',
@@ -294,13 +296,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2
+ARG PRINTBUDDY_REF=368f6a5364d69de1069db6c5e4739759a19109ea
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.37" \
+    io.hass.version="0.1.38" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

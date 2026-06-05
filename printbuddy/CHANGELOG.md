@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.38
+
+- Pinned the add-on build to Printbuddy commit `368f6a5364d69de1069db6c5e4739759a19109ea`, which improves Elegoo/Fluidd Moonraker connection probing.
+- If the default Moonraker `:7125` port is unreachable, Printbuddy now also tries the no-port Fluidd proxy URL before rejecting the printer.
+- Added a build-time guard so stale add-on builds fail if the Elegoo/Fluidd fallback probe is missing.
+
 ## 0.1.37
 
 - Pinned the add-on build to Printbuddy commit `b6ae02676c4b69ecbd8f0d5be56a88bdd3e9b8f2`, which fixes the setup window branding to use the correct Printbuddy app icon.
