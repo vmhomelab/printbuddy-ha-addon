@@ -1,3 +1,8 @@
+## 0.1.47
+
+- Fixes camera Diagnose for configured external camera URLs. The Diagnose/stethoscope button now tests the saved external MJPEG/RTSP/snapshot URL instead of falling back to the printer model's built-in Bambu camera port, so external MJPEG cameras report `mjpeg` / the URL port instead of `chamber_image` / `6000`.
+- Pins Printbuddy to `ea606087d70a618652288f5b32d6aa9be18f7df9`.
+
 # Changelog
 
 ## 0.1.46
