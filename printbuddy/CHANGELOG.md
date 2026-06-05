@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.40
+
+- Pinned the add-on build to Printbuddy commit `1a593e7b9440ce692cf7eddb8006d8f45add755f`, which adds non-AMS loaded-spool assignment support.
+- Non-AMS printers now show a loaded-spool picker so inventory can track the physically mounted spool without attempting Bambu AMS MQTT configuration.
+- Slice filament preset selection now prefers the assigned loaded spool when it matches the selected printer/filament requirement, so non-AMS slices prefill from inventory.
+
 ## 0.1.39
 
 - Pinned the add-on build to Printbuddy commit `bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53`, which maps Elegoo `/model` file paths to Moonraker's `gcodes` root.

@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53
+ARG PRINTBUDDY_REF=1a593e7b9440ce692cf7eddb8006d8f45add755f
 WORKDIR /src
 
 RUN apt-get update \
@@ -80,6 +80,20 @@ const checks = {
     'defaultOpen={false}',
     'Manual controls',
     "printer.provider === 'prusalink' ? 'PrusaLink movement and extrusion' : 'Klipper movement, extrusion, and temperatures'",
+    'const loadedSpoolAssignment = onGetAssignment?.(printer.id, -1, 0);',
+    'const showLoadedSpoolPicker = (amsData.length === 0) && ((status?.vt_tray?.length ?? 0) === 0);',
+    'Loaded spool',
+  ],
+  'frontend/src/components/SliceModal.tsx': [
+    'function pickFilamentForLoadedSpool',
+    'const loadedSpoolForSelectedPrinter = useMemo',
+    'pickFilamentForLoadedSpool(',
+    "queryKey: ['spool-assignments']",
+  ],
+  'backend/app/api/routes/inventory.py': [
+    '``ams_id=-1, tray_id=0`` is the virtual "loaded spool" marker',
+    'is_loaded_spool_marker = data.ams_id == -1 and data.tray_id == 0',
+    'if is_loaded_spool_marker:',
   ],
   'frontend/src/utils/printerFileRules.ts': [
     'accept: \'.3mf,.gcode.3mf\'',
@@ -304,13 +318,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=bb4c4f4ccef5b261b63d662c6f3fc067a9d24d53
+ARG PRINTBUDDY_REF=1a593e7b9440ce692cf7eddb8006d8f45add755f
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.39" \
+    io.hass.version="0.1.40" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
