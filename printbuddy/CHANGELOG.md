@@ -1,3 +1,9 @@
+## 0.1.54
+
+- Pins the add-on build to Printbuddy commit `db83b67d721f10a995395ac8ce3cc69cc9fccf44`.
+- Publishes the current dev/main-aligned Printbuddy build for Home Assistant.
+- Adds build-time guards so stale add-on builds fail if the updating/Docker quick-start docs point back to old Bambuddy images or raw compose URLs.
+
 ## 0.1.53
 
 - Pins the add-on build to Printbuddy commit `b756fe9bc0f42682c43f745b09e4a6f7f1faebf8`.
