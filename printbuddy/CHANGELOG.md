@@ -1,3 +1,8 @@
+## 0.1.48
+
+- Pins the add-on build to Printbuddy commit `8ef015f0b2a8fcf3d3863117e95ce16d9a80e785` from the restored `vmhomelab/printbuddy` fork.
+- Fixes the broken source archive download caused by the previous pin referencing a commit that no longer exists after restoring the fork relationship.
+
 ## 0.1.47
 
 - Fixes camera Diagnose for configured external camera URLs. The Diagnose/stethoscope button now tests the saved external MJPEG/RTSP/snapshot URL instead of falling back to the printer model's built-in Bambu camera port, so external MJPEG cameras report `mjpeg` / the URL port instead of `chamber_image` / `6000`.
