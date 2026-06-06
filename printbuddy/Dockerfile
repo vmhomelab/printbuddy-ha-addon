@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=db83b67d721f10a995395ac8ce3cc69cc9fccf44
+ARG PRINTBUDDY_REF=4ebd2cf2a354fba95c58055c63ec743f42533206
 WORKDIR /src
 
 RUN apt-get update \
@@ -37,6 +37,13 @@ const checks = {
   ],
   'backend/app/services/printer_manager.py': [
     'Skipping saved printer %s during startup: %s',
+  ],
+  'backend/app/main.py': [
+    '_camera_cleanup_task: asyncio.Task | None = None',
+    'CAMERA_CLEANUP_INTERVAL = 30',
+    'async def _camera_cleanup_loop() -> None:',
+    'from backend.app.api.routes.camera import cleanup_orphaned_streams',
+    'start_camera_cleanup()',
   ],
   'UPDATING.md': [
     'ghcr.io/vmhomelab/printbuddy:latest',
@@ -383,13 +390,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=db83b67d721f10a995395ac8ce3cc69cc9fccf44
+ARG PRINTBUDDY_REF=4ebd2cf2a354fba95c58055c63ec743f42533206
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.54" \
+    io.hass.version="0.1.55" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

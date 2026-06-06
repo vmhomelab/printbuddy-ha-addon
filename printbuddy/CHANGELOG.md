@@ -1,3 +1,9 @@
+## 0.1.55
+
+- Pins the add-on build to Printbuddy commit `4ebd2cf2a354fba95c58055c63ec743f42533206`.
+- Fixes Home Assistant add-on startup failing with `NameError: _camera_cleanup_task is not defined` during FastAPI lifespan startup.
+- Adds build-time guards so stale add-on builds fail if the camera cleanup background task wiring is missing.
+
 ## 0.1.54
 
 - Pins the add-on build to Printbuddy commit `db83b67d721f10a995395ac8ce3cc69cc9fccf44`.
