@@ -1,3 +1,9 @@
+## 0.1.51
+
+- Pins the add-on build to Printbuddy commit `f5113d875668175f05a1011c004a757fb92b971a` after the CI follow-up.
+- Keeps the Virtual Printer setup-guide buttons pointed at the Printbuddy wiki guide.
+- Completes the Printbuddy user-agent rebrand so backend CI no longer expects old Bambuddy identifiers.
+
 ## 0.1.50
 
 - Pins the add-on build to Printbuddy commit `5af47d0ca97ec3d3433ab12ef2ed7bf0a6b074b2`.
