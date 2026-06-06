@@ -1,3 +1,9 @@
+## 0.1.53
+
+- Pins the add-on build to Printbuddy commit `b756fe9bc0f42682c43f745b09e4a6f7f1faebf8`.
+- Switches the collapsed desktop sidebar branding to the standalone Printbuddy icon while expanded desktop and mobile/compact sidebars continue to use the full Printbuddy logo.
+- Adds build-time guards so stale add-on builds fail if the collapsed-sidebar icon fix or icon assets are missing.
+
 ## 0.1.52
 
 - Pins the add-on build to Printbuddy commit `61acb0302f10a90b1cb66615116e69204d053d4f`.

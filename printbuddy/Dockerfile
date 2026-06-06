@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=61acb0302f10a90b1cb66615116e69204d053d4f
+ARG PRINTBUDDY_REF=b756fe9bc0f42682c43f745b09e4a6f7f1faebf8
 WORKDIR /src
 
 RUN apt-get update \
@@ -136,6 +136,9 @@ const checks = {
   ],
   'frontend/src/components/Layout.tsx': [
     'appAssetPath',
+    'sidebarBrandImagePath',
+    'printbuddy_icon_dark.png',
+    'printbuddy_icon.png',
     'printbuddy_logo_dark.png',
     'printbuddy_logo_light.png',
     "versionInfo?.display_version || versionInfo?.version || '...'",
@@ -243,6 +246,8 @@ const requiredFiles = [
   'static/img/printers/prusa-mk4s.png',
   'static/img/printers/generic-printer.png',
   'static/img/printers/default.png',
+  'static/img/printbuddy_icon.png',
+  'static/img/printbuddy_icon_dark.png',
 ];
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) missing.push(`${file}: missing printer artwork asset`);
@@ -365,13 +370,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=61acb0302f10a90b1cb66615116e69204d053d4f
+ARG PRINTBUDDY_REF=b756fe9bc0f42682c43f745b09e4a6f7f1faebf8
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.52" \
+    io.hass.version="0.1.53" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
