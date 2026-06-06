@@ -1,3 +1,9 @@
+## 0.1.50
+
+- Pins the add-on build to Printbuddy commit `5af47d0ca97ec3d3433ab12ef2ed7bf0a6b074b2`.
+- Updates both Virtual Printer setup-guide buttons to open the Printbuddy wiki guide instead of any old Bambuddy/README target.
+- Adds the Printbuddy wiki Virtual Printer setup guide used by those buttons.
+
 ## 0.1.49
 
 - Pins the add-on build to Printbuddy commit `ddf62522a274e8dac405905dba56b8c93b83681f`.
