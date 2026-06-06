@@ -1,3 +1,8 @@
+## 0.1.49
+
+- Pins the add-on build to Printbuddy commit `ddf62522a274e8dac405905dba56b8c93b83681f`.
+- Fixes the camera pop-up path when Printbuddy runs behind Home Assistant Ingress. The printer-card camera button now opens `/api/hassio_ingress/<token>/camera/<printer_id>` instead of escaping to Home Assistant's root `/camera/<printer_id>`, which caused `404: Not Found`.
+
 ## 0.1.48
 
 - Pins the add-on build to Printbuddy commit `8ef015f0b2a8fcf3d3863117e95ce16d9a80e785` from the restored `vmhomelab/printbuddy` fork.
