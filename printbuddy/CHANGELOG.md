@@ -1,3 +1,9 @@
+## 0.1.52
+
+- Pins the add-on build to Printbuddy commit `61acb0302f10a90b1cb66615116e69204d053d4f`.
+- Fixes the Home Assistant Ingress camera pop-up route itself: the new `/api/hassio_ingress/<token>/camera/<printer_id>` URL now matches the React camera route and the stream/snapshot/stop URLs stay under the same ingress prefix.
+- Adds build-time guards so stale add-on builds fail if the ingress camera route regression returns.
+
 ## 0.1.51
 
 - Pins the add-on build to Printbuddy commit `f5113d875668175f05a1011c004a757fb92b971a` after the CI follow-up.

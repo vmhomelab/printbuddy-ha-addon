@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=f5113d875668175f05a1011c004a757fb92b971a
+ARG PRINTBUDDY_REF=61acb0302f10a90b1cb66615116e69204d053d4f
 WORKDIR /src
 
 RUN apt-get update \
@@ -18,6 +18,10 @@ RUN curl -fsSL "https://github.com/vmhomelab/Printbuddy/archive/${PRINTBUDDY_REF
 RUN node - <<'JS'
 const fs = require('fs');
 const checks = {
+  'frontend/src/App.tsx': [
+    'appBasePath',
+    '<BrowserRouter basename={appBasePath() || undefined}>',
+  ],
   'backend/app/services/printer_providers/moonraker.py': [
     'raw_data: dict[str, Any] = field(default_factory=dict)',
     'hms_errors: list[Any] = field(default_factory=list)',
@@ -138,6 +142,20 @@ const checks = {
   ],
   'frontend/src/pages/PrintersPage.tsx': [
     'appAssetPath(`/camera/${printer.id}`)',
+  ],
+  'frontend/src/pages/CameraPage.tsx': [
+    'appAssetPath(`/api/v1/printers/${id}/camera/stream?fps=${fps}&t=${imageKey}`)',
+    'appAssetPath(`/api/v1/printers/${id}/camera/snapshot?t=${imageKey}`)',
+    'appAssetPath(`/api/v1/printers/${id}/camera/stop`)',
+  ],
+  'frontend/src/contexts/AuthContext.tsx': [
+    'appBasePath',
+    "appAssetPath('/setup')",
+    "appAssetPath('/login')",
+  ],
+  'frontend/src/__tests__/App.ingress.test.tsx': [
+    'renders the standalone camera route when the URL is prefixed by Home Assistant ingress',
+    '/api/hassio_ingress/printbuddy123/api/v1/printers/1/camera/stream',
   ],
   'frontend/src/pages/SettingsPage.tsx': [
     "versionInfo?.display_version || versionInfo?.version || '...'",
@@ -306,17 +324,6 @@ for (const attr of ['src', 'href'] as const) {
 
 edit('frontend/vite.config.ts', (s) => s.replace('export default defineConfig({\n', "export default defineConfig({\n  base: './',\n"));
 edit('frontend/src/main.tsx', (s) => s.replace("import './i18n' // Initialize i18n\n", "import './i18n' // Initialize i18n\nimport './ha-ingress'\n"));
-edit('frontend/src/App.tsx', (s) => s
-  .replace("import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';", "import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';\nimport { printbuddyIngressBase } from './ha-ingress';")
-  .replace('<BrowserRouter>', '<BrowserRouter basename={printbuddyIngressBase() || undefined}>')
-  .replace('                  <Route path="camera-tokens" element={<Navigate to="/settings?tab=apikeys#card-camera-tokens" replace />} />\n', '                  <Route path="camera-tokens" element={<Navigate to="/settings?tab=apikeys#card-camera-tokens" replace />} />\n                  <Route path="*" element={<Navigate to="/" replace />} />\n')
-);
-edit('frontend/src/contexts/AuthContext.tsx', (s) => s
-  .replace("import { api, getAuthToken, setAuthToken } from '../api/client';", "import { api, getAuthToken, setAuthToken } from '../api/client';\nimport { printbuddyIngressBase, printbuddyWithIngressBase } from '../ha-ingress';")
-  .replace('      const currentPath = window.location.pathname;', "      const currentPath = window.location.pathname.replace(printbuddyIngressBase(), '') || '/';")
-  .replace("        window.location.href = '/setup';", "        window.location.href = printbuddyWithIngressBase('/setup');")
-  .replace("    window.location.href = '/login';", "    window.location.href = printbuddyWithIngressBase('/login');")
-);
 edit('frontend/src/api/client.ts', (s) => s.replace("const API_BASE = '/api/v1';", "const INGRESS_BASE = window.location.pathname.match(/^(.*\\/api\\/hassio_ingress\\/[^/]+)(?:\\/|$)/)?.[1] ?? '';\nconst API_BASE = `${INGRESS_BASE}/api/v1`;"));
 edit('frontend/src/hooks/useWebSocket.ts', (s) => s.replace(
   "    const wsUrl = `${protocol}//${window.location.host}/api/v1/ws`;",
@@ -358,13 +365,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=f5113d875668175f05a1011c004a757fb92b971a
+ARG PRINTBUDDY_REF=61acb0302f10a90b1cb66615116e69204d053d4f
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.51" \
+    io.hass.version="0.1.52" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
