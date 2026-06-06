@@ -1,3 +1,8 @@
+## 0.1.56
+
+- Pins the add-on build to Printbuddy commit `667f347967c4ed67e1ce908bb306db96dabbb9d1`.
+- Keeps the Home Assistant startup fix from 0.1.55 and pins the follow-up CI-clean source commit.
+
 ## 0.1.55
 
 - Pins the add-on build to Printbuddy commit `4ebd2cf2a354fba95c58055c63ec743f42533206`.
