@@ -1,3 +1,9 @@
+## 0.1.58
+
+- Pins the add-on build to Printbuddy commit `5529608fb29056ca1461690a1eb15f23dd1ef0a0`.
+- Adds prominent Source code links to the authenticated sidebar and pre-login screens so Home Assistant add-on users can reach the AGPL-3.0 corresponding source from the UI.
+- Adds build-time guards so stale add-on builds fail if the source-code UI links are missing.
+
 ## 0.1.57
 
 - Pins the add-on build to Printbuddy commit `aeca5aaaeba45fc23c7e63a413aeeac96fc92684`.

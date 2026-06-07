@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=aeca5aaaeba45fc23c7e63a413aeeac96fc92684
+ARG PRINTBUDDY_REF=5529608fb29056ca1461690a1eb15f23dd1ef0a0
 WORKDIR /src
 
 RUN apt-get update \
@@ -162,6 +162,15 @@ const checks = {
     'printbuddy_logo_dark.png',
     'printbuddy_logo_light.png',
     "versionInfo?.display_version || versionInfo?.version || '...'",
+    "const SOURCE_CODE_URL = 'https://github.com/vmhomelab/Printbuddy'",
+    '<span className="text-xs font-medium">Source code</span>',
+    'aria-label="Source code"',
+  ],
+  'frontend/src/pages/LoginPage.tsx': [
+    "const SOURCE_CODE_URL = 'https://github.com/vmhomelab/Printbuddy'",
+    'function SourceCodeLink()',
+    '<span>Source code</span>',
+    '<SourceCodeLink />',
   ],
   'frontend/src/pages/PrintersPage.tsx': [
     'appAssetPath(`/camera/${printer.id}`)',
@@ -390,13 +399,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=aeca5aaaeba45fc23c7e63a413aeeac96fc92684
+ARG PRINTBUDDY_REF=5529608fb29056ca1461690a1eb15f23dd1ef0a0
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.56" \
+    io.hass.version="0.1.58" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
