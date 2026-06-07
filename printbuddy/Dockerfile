@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=667f347967c4ed67e1ce908bb306db96dabbb9d1
+ARG PRINTBUDDY_REF=aeca5aaaeba45fc23c7e63a413aeeac96fc92684
 WORKDIR /src
 
 RUN apt-get update \
@@ -390,7 +390,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=667f347967c4ed67e1ce908bb306db96dabbb9d1
+ARG PRINTBUDDY_REF=aeca5aaaeba45fc23c7e63a413aeeac96fc92684
 
 LABEL \
     io.hass.name="Printbuddy" \

@@ -1,3 +1,8 @@
+## 0.1.57
+
+- Pins the add-on build to Printbuddy commit `aeca5aaaeba45fc23c7e63a413aeeac96fc92684`.
+- Fixes Moonraker/Klipper camera buttons so they open the configured Camera URL inside Printbuddy's normal camera viewer instead of opening the Moonraker/Fluidd API URL in a separate browser tab.
+
 ## 0.1.56
 
 - Pins the add-on build to Printbuddy commit `667f347967c4ed67e1ce908bb306db96dabbb9d1`.
