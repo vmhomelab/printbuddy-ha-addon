@@ -1,0 +1,284 @@
+name: Prepare Printbuddy add-on release
+
+on:
+  workflow_dispatch:
+    inputs:
+      printbuddy_ref:
+        description: "Printbuddy branch, tag, or full commit SHA to pin"
+        required: true
+        default: "dev"
+      version:
+        description: "Add-on version to release. Leave empty to bump patch from config.yaml"
+        required: false
+        default: ""
+      changelog:
+        description: "Changelog bullet text for this release"
+        required: true
+        default: "Publishes the selected Printbuddy source revision for Home Assistant."
+      verify_app_checks:
+        description: "Fail when the pinned Printbuddy commit has non-green GitHub checks"
+        required: true
+        default: true
+        type: boolean
+      publish_main:
+        description: "Also fast-forward main to the generated release commit for Home Assistant Store visibility"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  checks: read
+  actions: read
+
+concurrency:
+  group: printbuddy-addon-release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  prepare-release:
+    name: Bump add-on metadata and pin Printbuddy source
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout add-on repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install validation dependencies
+        run: python3 -m pip install --quiet pyyaml
+
+      - name: Resolve Printbuddy ref to commit SHA
+        id: resolve
+        env:
+          INPUT_REF: ${{ inputs.printbuddy_ref }}
+        run: |
+          set -euo pipefail
+          ref="${INPUT_REF}"
+          if [[ "$ref" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            sha="${ref,,}"
+          else
+            sha="$(git ls-remote https://github.com/vmhomelab/Printbuddy.git "refs/heads/${ref}" "refs/tags/${ref}" | awk 'NR == 1 {print $1}')"
+            if [[ -z "$sha" ]]; then
+              sha="$(git ls-remote https://github.com/vmhomelab/Printbuddy.git "$ref" | awk 'NR == 1 {print $1}')"
+            fi
+          fi
+          if [[ -z "${sha:-}" ]]; then
+            echo "Could not resolve Printbuddy ref: $ref" >&2
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Resolved $ref -> $sha"
+
+      - name: Verify Printbuddy source archive exists
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          curl -fsSL --head "https://github.com/vmhomelab/Printbuddy/archive/${SHA}.tar.gz" >/dev/null
+          echo "Archive is reachable for $SHA"
+
+      - name: Check pinned Printbuddy GitHub checks
+        if: ${{ inputs.verify_app_checks }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.request
+
+          sha = os.environ["SHA"]
+          token = os.environ.get("GH_TOKEN", "")
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/vmhomelab/Printbuddy/commits/{sha}/check-runs?per_page=100",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {token}",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=30) as response:
+              data = json.load(response)
+          checks = data.get("check_runs", [])
+          if not checks:
+              print(f"::warning::No GitHub check-runs found for Printbuddy commit {sha}; continuing.")
+              raise SystemExit(0)
+          bad = [
+              c for c in checks
+              if c.get("status") != "completed" or c.get("conclusion") != "success"
+          ]
+          for check in checks:
+              print(f"{check.get('name')}: {check.get('status')} / {check.get('conclusion')}")
+          if bad:
+              print("::error::Pinned Printbuddy commit has non-green checks:")
+              for check in bad:
+                  print(f"- {check.get('name')}: {check.get('status')} / {check.get('conclusion')}")
+              raise SystemExit(1)
+          PY
+
+      - name: Update add-on metadata
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+          CHANGELOG_TEXT: ${{ inputs.changelog }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import os
+          import re
+          from pathlib import Path
+
+          import yaml
+
+          sha = os.environ["SHA"]
+          requested_version = os.environ.get("REQUESTED_VERSION", "").strip()
+          changelog_text = os.environ.get("CHANGELOG_TEXT", "").strip()
+
+          config_path = Path("printbuddy/config.yaml")
+          build_path = Path("printbuddy/build.yaml")
+          dockerfile_path = Path("printbuddy/Dockerfile")
+          changelog_path = Path("printbuddy/CHANGELOG.md")
+
+          config = yaml.safe_load(config_path.read_text())
+          current_version = str(config["version"])
+
+          def bump_patch(version: str) -> str:
+              match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", version)
+              if not match:
+                  raise SystemExit(f"Cannot auto-bump non-semver version: {version}")
+              major, minor, patch = map(int, match.groups())
+              return f"{major}.{minor}.{patch + 1}"
+
+          version = requested_version or bump_patch(current_version)
+          if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+              raise SystemExit(f"Version must use x.y.z format, got: {version}")
+
+          config["version"] = version
+          config_path.write_text(yaml.safe_dump(config, sort_keys=False), encoding="utf-8")
+
+          build = yaml.safe_load(build_path.read_text())
+          build.setdefault("args", {})["PRINTBUDDY_REF"] = sha
+          build_path.write_text(yaml.safe_dump(build, sort_keys=False), encoding="utf-8")
+
+          dockerfile = dockerfile_path.read_text(encoding="utf-8")
+          dockerfile = re.sub(r"ARG PRINTBUDDY_REF=[0-9a-fA-F]{40}", f"ARG PRINTBUDDY_REF={sha}", dockerfile)
+          dockerfile = re.sub(r'io\.hass\.version="[^"]+"', f'io.hass.version="{version}"', dockerfile)
+          dockerfile_path.write_text(dockerfile, encoding="utf-8")
+
+          changelog = changelog_path.read_text(encoding="utf-8") if changelog_path.exists() else ""
+          bullets = [f"- Pins the add-on build to Printbuddy commit `{sha}`."]
+          if changelog_text:
+              for line in changelog_text.splitlines():
+                  line = line.strip()
+                  if not line:
+                      continue
+                  bullets.append(line if line.startswith("- ") else f"- {line}")
+          entry = f"## {version}\n\n" + "\n".join(bullets) + "\n\n"
+          if re.search(rf"^##\s+{re.escape(version)}\s*$", changelog, flags=re.MULTILINE):
+              raise SystemExit(f"CHANGELOG.md already contains version {version}")
+          changelog_path.write_text(entry + changelog, encoding="utf-8")
+
+          print(f"Prepared add-on version {version} pinned to Printbuddy {sha}")
+          PY
+
+      - name: Validate generated release metadata
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import yaml
+
+          repo = yaml.safe_load(Path('repository.yaml').read_text())
+          config = yaml.safe_load(Path('printbuddy/config.yaml').read_text())
+          build = yaml.safe_load(Path('printbuddy/build.yaml').read_text())
+          dockerfile = Path('printbuddy/Dockerfile').read_text()
+          changelog = Path('printbuddy/CHANGELOG.md').read_text()
+
+          version = str(config['version'])
+          ref = str(build['args']['PRINTBUDDY_REF'])
+          assert repo['name']
+          assert config['slug'] == 'printbuddy'
+          assert config['ingress'] is True
+          assert config['ingress_port'] == 8000
+          assert config['host_network'] is True
+          assert re.fullmatch(r'\d+\.\d+\.\d+', version)
+          assert re.fullmatch(r'[0-9a-f]{40}', ref)
+          assert dockerfile.count(f'ARG PRINTBUDDY_REF={ref}') >= 2
+          assert f'io.hass.version="{version}"' in dockerfile
+          assert changelog.startswith(f'## {version}\n')
+          assert f'`{ref}`' in changelog.split('\n## ', 1)[0]
+          PY
+          sh -n printbuddy/rootfs/run.sh
+          git diff --check
+
+      - name: Commit release metadata
+        id: commit
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No metadata changes generated."
+            exit 0
+          fi
+          version="$(python3 - <<'PY'
+          import yaml
+          print(yaml.safe_load(open('printbuddy/config.yaml'))['version'])
+          PY
+          )"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add printbuddy/config.yaml printbuddy/build.yaml printbuddy/Dockerfile printbuddy/CHANGELOG.md
+          git commit -m "Release Printbuddy addon ${version}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Push release branch
+        if: ${{ steps.commit.outputs.changed == 'true' }}
+        run: |
+          set -euo pipefail
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Fast-forward main for Home Assistant visibility
+        if: ${{ steps.commit.outputs.changed == 'true' && inputs.publish_main && github.ref_name != 'main' }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "main is not an ancestor of this release commit; refusing to overwrite main." >&2
+            exit 1
+          fi
+          git push origin "HEAD:main"
+
+      - name: Summary
+        run: |
+          version="$(python3 - <<'PY'
+          import yaml
+          print(yaml.safe_load(open('printbuddy/config.yaml'))['version'])
+          PY
+          )"
+          ref="$(python3 - <<'PY'
+          import yaml
+          print(yaml.safe_load(open('printbuddy/build.yaml'))['args']['PRINTBUDDY_REF'])
+          PY
+          )"
+          {
+            echo "## Printbuddy add-on release prepared"
+            echo "- Add-on version: ${version}"
+            echo "- Printbuddy ref: ${ref}"
+            echo "- Branch: ${GITHUB_REF_NAME}"
+            echo "- publish_main: ${{ inputs.publish_main }}"
+          } >> "$GITHUB_STEP_SUMMARY"
