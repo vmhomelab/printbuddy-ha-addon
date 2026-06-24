@@ -46,7 +46,7 @@ const checks = {
     'start_camera_cleanup()',
   ],
   'UPDATING.md': [
-    'ghcr.io/vmhomelab/printbuddy:latest',
+    'docker.io/vmhomelabde/printbuddy:latest',
     'raw.githubusercontent.com/vmhomelab/Printbuddy/main/docker-compose.yml',
     '!ghcr.io/maziggy/bambuddy',
     '!maziggy/bambuddy',
@@ -405,7 +405,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.60" \
+    io.hass.version="0.1.61" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

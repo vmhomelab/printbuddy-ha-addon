@@ -1,3 +1,8 @@
+## 0.1.61
+
+- Fixes the add-on build guard so it matches the current documented Docker Hub image namespace.
+- Keeps the add-on pinned to Printbuddy commit `4794a11b81999d8e1499b7710773153ca96ec1ae`.
+
 ## 0.1.60
 
 - Pins the add-on build to Printbuddy commit `4794a11b81999d8e1499b7710773153ca96ec1ae`.
