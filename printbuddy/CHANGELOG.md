@@ -1,3 +1,8 @@
+## 0.1.60
+
+- Pins the add-on build to Printbuddy commit `4794a11b81999d8e1499b7710773153ca96ec1ae`.
+- Publishes the selected Printbuddy source revision for Home Assistant.
+
 ## 0.1.59
 
 - Pins the add-on build to Printbuddy commit `246bdd79d4bde3b16e41c7f537e3e3f2e699aeeb` / `v0.2.4.6`, matching the latest published Printbuddy image.
