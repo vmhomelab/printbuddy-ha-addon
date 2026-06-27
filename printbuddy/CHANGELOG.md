@@ -1,3 +1,8 @@
+## 0.1.62
+
+- Pins the add-on build to Printbuddy commit `21983c65e47901423878510629c2bf33dc23a25d`.
+- Fixes the camera window behind Home Assistant Ingress so the standalone viewer loads its JS/CSS assets from the add-on ingress prefix before opening the stream.
+
 ## 0.1.61
 
 - Fixes the add-on build guard so it matches the current documented Docker Hub image namespace.
