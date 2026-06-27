@@ -1,3 +1,8 @@
+## 0.1.63
+
+- Pins the add-on build to Printbuddy commit `ba55c78c9a9c411dfddc896ef51769cdee9df3a4`.
+- Fixes Klipper/Moonraker print archiving by wiring provider status transitions into Printbuddy's print-start and print-complete callbacks.
+
 ## 0.1.62
 
 - Pins the add-on build to Printbuddy commit `21983c65e47901423878510629c2bf33dc23a25d`.
