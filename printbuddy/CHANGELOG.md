@@ -1,3 +1,9 @@
+## 0.1.66
+
+- Pins the add-on build to Printbuddy commit `168398dde171ed06a4aa00ac8f457673c9efcc9d` / `v0.2.5.1b13`.
+- Publishes the beta updater fix release for Home Assistant add-on users so the running app reports `APP_VERSION=0.2.5.1b13` and no longer keeps offering the same beta after updating.
+- Updates the add-on source guard for the current loaded-spool/CFS assignment condition so valid current Printbuddy sources are not rejected during the add-on build.
+
 ## 0.1.65
 
 - Pins the add-on build to Printbuddy commit `12868cfb3bd2ea001d24b2e0a1c6b4a6828f86ff`.

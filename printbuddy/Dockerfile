@@ -1,7 +1,7 @@
 ARG RUNTIME_FROM=python:3.12-slim-bookworm
 
 FROM node:22-bookworm-slim AS printbuddy-src
-ARG PRINTBUDDY_REF=12868cfb3bd2ea001d24b2e0a1c6b4a6828f86ff
+ARG PRINTBUDDY_REF=168398dde171ed06a4aa00ac8f457673c9efcc9d
 WORKDIR /src
 
 RUN apt-get update \
@@ -127,7 +127,7 @@ const checks = {
   'backend/app/api/routes/inventory.py': [
     '``ams_id=-1, tray_id=0`` is the virtual "loaded spool" marker',
     'is_loaded_spool_marker = data.ams_id == -1 and data.tray_id == 0',
-    'if is_loaded_spool_marker:',
+    'if is_loaded_spool_marker or is_cfs_slot:',
   ],
   'frontend/src/utils/printerFileRules.ts': [
     'accept: \'.3mf,.gcode.3mf\'',
@@ -403,13 +403,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 RUN npm run build
 
 FROM ${RUNTIME_FROM}
-ARG PRINTBUDDY_REF=12868cfb3bd2ea001d24b2e0a1c6b4a6828f86ff
+ARG PRINTBUDDY_REF=168398dde171ed06a4aa00ac8f457673c9efcc9d
 
 LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.1.65" \
+    io.hass.version="0.1.66" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \
