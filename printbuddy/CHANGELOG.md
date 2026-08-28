@@ -1,3 +1,8 @@
+## 0.2.2
+
+- Pins the add-on build to the current upstream Printbuddy main tag `v0.2.5.1` / commit `b9f81c7a9a5fae861daf2e91737e4e978db8aa5e`.
+- Publishes the current main-branch Printbuddy release for Home Assistant add-on users.
+
 ## 0.1.66
 
 - Pins the add-on build to Printbuddy commit `168398dde171ed06a4aa00ac8f457673c9efcc9d` / `v0.2.5.1b13`.
