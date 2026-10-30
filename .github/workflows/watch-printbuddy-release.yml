@@ -1,0 +1,94 @@
+name: Watch Printbuddy releases
+
+# Detects a new (non-prerelease) Printbuddy release and triggers
+# prepare-addon-release.yml, which pins the release commit in Dockerfile and
+# build.yaml, bumps the add-on version and writes the changelog entry.
+
+on:
+  schedule:
+    - cron: "17 * * * *" # hourly
+  repository_dispatch:
+    types: [printbuddy-release] # optional instant trigger from the Printbuddy repo
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Printbuddy release tag to pin. Leave empty for the latest release"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: watch-printbuddy-release
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout add-on repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Resolve Printbuddy release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.tag || github.event.client_payload.tag }}
+        run: |
+          set -euo pipefail
+          tag="${INPUT_TAG:-}"
+          if [[ -z "$tag" ]]; then
+            tag="$(gh api repos/vmhomelab/Printbuddy/releases/latest --jq .tag_name)"
+          fi
+
+          # Prefer the peeled commit of annotated tags (^{}), fall back to lightweight tags.
+          refs="$(git ls-remote https://github.com/vmhomelab/Printbuddy.git "refs/tags/${tag}" "refs/tags/${tag}^{}")"
+          sha="$(awk '/\^\{\}$/ {print $1}' <<<"$refs")"
+          [[ -n "$sha" ]] || sha="$(awk 'NR == 1 {print $1}' <<<"$refs")"
+          if [[ -z "$sha" ]]; then
+            echo "Could not resolve Printbuddy tag: $tag" >&2
+            exit 1
+          fi
+
+          current="$(awk '/PRINTBUDDY_REF:/ {print $2}' printbuddy/build.yaml)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          if [[ "$sha" == "$current" ]]; then
+            echo "outdated=false" >> "$GITHUB_OUTPUT"
+            echo "Add-on already pins Printbuddy $tag ($sha)."
+          else
+            echo "outdated=true" >> "$GITHUB_OUTPUT"
+            echo "Printbuddy $tag ($sha) differs from pinned $current."
+          fi
+
+      - name: Skip if a release run is already in progress
+        id: busy
+        if: steps.release.outputs.outdated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          running="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow prepare-addon-release.yml \
+            --json status --jq '[.[] | select(.status != "completed")] | length')"
+          echo "running=$running" >> "$GITHUB_OUTPUT"
+          [[ "$running" == "0" ]] || echo "prepare-addon-release is already running; will retry next schedule."
+
+      - name: Trigger add-on release
+        if: steps.release.outputs.outdated == 'true' && steps.busy.outputs.running == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh workflow run prepare-addon-release.yml --repo "$GITHUB_REPOSITORY" --ref main \
+            -f printbuddy_ref="$SHA" \
+            -f version="" \
+            -f changelog="Updates Printbuddy to release ${TAG}." \
+            -f verify_app_checks=true \
+            -f publish_main=false
+          echo "## Triggered add-on release for Printbuddy ${TAG} (\`${SHA}\`)" >> "$GITHUB_STEP_SUMMARY"
