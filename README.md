@@ -1,6 +1,6 @@
 # Printbuddy Home Assistant Add-on Repository
 
-This repository packages [Printbuddy](https://github.com/vmhomelab/Printbuddy) as a Home Assistant add-on.
+This repository packages [Printbuddy](https://github.com/vmhomelab/Printbuddy) as a Home Assistant application.
 
 Printbuddy is a self-hosted 3D printer management app for Bambu Lab, Klipper and Prusa printers. The add-on keeps the current Printbuddy feature set available inside Home Assistant, including the web UI, printer monitoring, archive/queue features, virtual-printer compatibility ports, and Moonraker support.
 
@@ -13,17 +13,26 @@ Printbuddy is a self-hosted 3D printer management app for Bambu Lab, Klipper and
 
 ## Installation
 
-1. In Home Assistant, open **Settings → Add-ons → Add-on Store**.
+### Add Repository
+#### Automátic
+ [![Print Buddy Application](https://my.home-assistant.io/badges/supervisor_store.svg)](https://my.home-assistant.io/redirect/supervisor_store/?repository_url=https://github.com/vmhomelab/printbuddy-ha-addon)
+
+#### Manual
+1. In Home Assistant, open **Settings → Applications → Install application**.
 2. Open the **⋮** menu and choose **Repositories**.
 3. Add this repository URL:
 
    ```text
    https://github.com/vmhomelab/printbuddy-ha-addon
-   ```
+         ```
 
-4. Install **Printbuddy**.
-5. Start the add-on.
-6. Open the add-on through **Open Web UI** or the sidebar panel.
+### Install application
+
+1. In Home Assistant, open **Settings → Applications → Install application**.
+2. Install **PrintBuddy**.
+3. Start the add-on.
+4. Open the add-on through **Open Web UI** or the sidebar panel.
+
 
 ## Notes
 
