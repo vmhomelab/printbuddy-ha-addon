@@ -1,3 +1,8 @@
+## 0.2.5
+
+- Pins the add-on build to Printbuddy commit `7818c9ca8f8b633d9c7014ade22339cefbaa7bdb`.
+- Fixes the 0.2.4 image build: the source guard looked for code markers that Printbuddy v0.2.5.4 renamed (multi-tool spool assignment, OctoPrint printer images).
+
 ## 0.2.4
 
 - Pins the add-on build to Printbuddy commit `7818c9ca8f8b633d9c7014ade22339cefbaa7bdb`.
