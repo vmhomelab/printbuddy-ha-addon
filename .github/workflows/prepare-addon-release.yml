@@ -20,6 +20,10 @@ on:
         required: true
         default: true
         type: boolean
+      ignored_checks:
+        description: "Comma-separated Printbuddy check names that never block a release (notifications, blog posts, ...)"
+        required: false
+        default: "notify-n8n"
       publish_main:
         description: "Also fast-forward main to the generated release commit for Home Assistant Store visibility"
         required: true
@@ -85,6 +89,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ steps.resolve.outputs.sha }}
+          IGNORED_CHECKS: ${{ inputs.ignored_checks || 'notify-n8n' }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -105,13 +110,27 @@ jobs:
           )
           with urllib.request.urlopen(req, timeout=30) as response:
               data = json.load(response)
-          checks = data.get("check_runs", [])
+          # Side-effect jobs (release notifications such as notify-n8n, blog
+          # posts) say nothing about whether the app itself is releasable, so
+          # an outage of an external service must not block the add-on update.
+          ignored = {
+              name.strip().lower()
+              for name in os.environ.get("IGNORED_CHECKS", "").split(",")
+              if name.strip()
+          }
+          checks = []
+          for check in data.get("check_runs", []):
+              if (check.get("name") or "").strip().lower() in ignored:
+                  print(f"Ignoring {check.get('name')}: {check.get('status')} / {check.get('conclusion')}")
+              else:
+                  checks.append(check)
           if not checks:
               print(f"::warning::No GitHub check-runs found for Printbuddy commit {sha}; continuing.")
               raise SystemExit(0)
           bad = [
               c for c in checks
-              if c.get("status") != "completed" or c.get("conclusion") != "success"
+              if c.get("status") != "completed"
+              or c.get("conclusion") not in {"success", "skipped", "neutral"}
           ]
           for check in checks:
               print(f"{check.get('name')}: {check.get('status')} / {check.get('conclusion')}")
