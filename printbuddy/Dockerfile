@@ -126,8 +126,8 @@ const checks = {
   ],
   'backend/app/api/routes/inventory.py': [
     '``ams_id=-1, tray_id=0`` is the virtual "loaded spool" marker',
-    'is_loaded_spool_marker = data.ams_id == -1 and data.tray_id == 0',
-    'if is_loaded_spool_marker or is_cfs_slot:',
+    'is_local_tool_assignment = data.ams_id == -1 and data.tray_id >= 0',
+    'if is_local_tool_assignment or is_assignment_only_slot:',
   ],
   'frontend/src/utils/printerFileRules.ts': [
     'accept: \'.3mf,.gcode.3mf\'',
@@ -152,7 +152,7 @@ const checks = {
     "[/^elegooneptune4max$/, 'elegoo-neptune-4-max']",
     "[/^prusacoreone$/, 'prusa-core-one']",
     "[/^prusamk4s$/, 'prusa-mk4s']",
-    "[/^(?:klipper|prusalink|genericklipperprinter|genericfdmprinter)$/, 'generic-printer']",
+    "genericklipperprinter|genericfdmprinter)$/, 'generic-printer']",
   ],
   'frontend/src/utils/assetPaths.ts': [
     'appAssetPath',
@@ -409,7 +409,7 @@ LABEL \
     io.hass.name="Printbuddy" \
     io.hass.description="Self-hosted 3D printer management for Bambu Lab, Klipper/Moonraker, and PrusaLink printers" \
     io.hass.type="addon" \
-    io.hass.version="0.2.4" \
+    io.hass.version="0.2.5" \
     maintainer="Marko Buculovic <info@vmhomelab.de>" \
     org.opencontainers.image.title="Printbuddy Home Assistant Add-on" \
     org.opencontainers.image.description="Home Assistant add-on wrapper for Printbuddy" \

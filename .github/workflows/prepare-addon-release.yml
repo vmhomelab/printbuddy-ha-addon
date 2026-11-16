@@ -84,6 +84,31 @@ jobs:
           curl -fsSL --head "https://github.com/vmhomelab/Printbuddy/archive/${SHA}.tar.gz" >/dev/null
           echo "Archive is reachable for $SHA"
 
+      # Runs the same source guard as the image build (the `RUN node - <<'JS'`
+      # block in printbuddy/Dockerfile) against the commit about to be pinned.
+      # Without this, a refactor in Printbuddy only shows up as a failed build
+      # on the user's Home Assistant after the release is already out.
+      - name: Check Printbuddy source against the add-on build guard
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          src="$RUNNER_TEMP/printbuddy-src"
+          guard="$RUNNER_TEMP/source-guard.js"
+          mkdir -p "$src"
+          curl -fsSL "https://github.com/vmhomelab/Printbuddy/archive/${SHA}.tar.gz" \
+            | tar -xz --strip-components=1 -C "$src"
+          awk "/^RUN node - <<'JS'\$/{f=1;next} f&&/^JS\$/{exit} f" printbuddy/Dockerfile > "$guard"
+          if [[ ! -s "$guard" ]]; then
+            echo "::error::Could not extract the source guard from printbuddy/Dockerfile" >&2
+            exit 1
+          fi
+          if ! (cd "$src" && node "$guard"); then
+            echo "::error::Printbuddy ${SHA} fails the add-on build guard. Update the markers in printbuddy/Dockerfile before releasing." >&2
+            exit 1
+          fi
+          echo "Printbuddy ${SHA} passes the add-on build guard."
+
       - name: Check pinned Printbuddy GitHub checks
         if: ${{ inputs.verify_app_checks }}
         env:
