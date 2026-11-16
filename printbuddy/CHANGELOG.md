@@ -1,3 +1,8 @@
+## 0.2.4
+
+- Pins the add-on build to Printbuddy commit `7818c9ca8f8b633d9c7014ade22339cefbaa7bdb`.
+- Updates Printbuddy to release v0.2.5.4.
+
 ## 0.2.3
 
 - Pins the add-on build to Printbuddy commit `081f5cb33df03ed38c4c53b5881552ff33b08da6`.
